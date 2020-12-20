@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Share Note</title>
+</head>
+
+<body>
+    <hr>
+    <form action="" method="POST">
+        <input type="text" class="usernick" placeholder="Nick" />
+        <input type="text" class="userlocation" placeholder="Location" />
+        <input type="text" class="usernote" placeholder="Note" />
+        <input type="text" class="usertags" placeholder="Tags" />
+        <input type="text" class="usernotetime" placeholder="Time" />
+        <input type="submit" />
+    </form>
+    <hr>
+
+    <div class="message_holder" id="id_messageholder"></div>
+    <h3 style='color: #ccc;font-size: 30px;'>No Users Yet..</h3>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        var form = $('form').on('submit', function (e) {
+            e.preventDefault();
+
+            let url = "http://127.0.0.1:5000/sharenote";
+            let json = {
+                "nick": $('input.usernick').val(),
+                "location": $('input.userlocation').val(),
+                "note": $('input.usernote').val(),
+                "tags": $('input.usertags').val(),
+                "time": $('input.usernotetime').val(),
+
+            };
+            
+            $.post(url, json);
+            $('input.message').val('').focus();
+        });
+
+        socket.on('connect', () => {
+            socket.on('user_event', (userJsonList) => {
+                if (typeof userJsonList !== 'undefined') {
+                    $('h3').remove();
+                    //$('div.message_holder').remove();
+                    $div = document.getElementById("id_messageholder").innerHTML = "";
+
+                    userJsonList.forEach(user => {
+                        $('div.message_holder').append(
+                            '<ul><li><b>Kullanıcı: </b>' + user.nick
+                            + '</li><li><b>Konum: </b>' + user.location
+                            + '</li><li><b>Not: </b>' + user.note
+                            + '</li><li><b>Etiketler: </b>' + user.tags
+                            + '</li><li><b>Süre(Sn): </b>' + user.time
+                            + '</li><li><b>Başlama Zamanı: </b>' + user.starting_time
+                            + '</li><li><b>Silinme Zamanı: </b>' + user.ending_time
+                            + '</li></ul>'
+                        );
+                    });
+                }
+            });
+        });
+
+
+    </script>
+
+</body>
+
+</html>
