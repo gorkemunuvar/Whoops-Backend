@@ -9,9 +9,9 @@
     <hr>
     <form action="" method="POST">
         <input type="text" class="usernick" placeholder="Nick" />
-        <input type="text" class="userlocation" placeholder="Location" />
+        <input type="text" class="userlatitude" placeholder="Latitude" />
+        <input type="text" class="userlongitude" placeholder="Longitude" />
         <input type="text" class="usernote" placeholder="Note" />
-        <input type="text" class="usertags" placeholder="Tags" />
         <input type="text" class="usernotetime" placeholder="Time" />
         <input type="submit" />
     </form>
@@ -32,13 +32,12 @@
             let url = "http://127.0.0.1:5000/sharenote";
             let json = {
                 "nick": $('input.usernick').val(),
-                "location": $('input.userlocation').val(),
+                "latitude": $('input.userlatitude').val(),
+                "longitude": $('input.userlongitude').val(),
                 "note": $('input.usernote').val(),
-                "tags": $('input.usertags').val(),
                 "time": $('input.usernotetime').val(),
-
             };
-            
+
             $.post(url, json);
             $('input.message').val('').focus();
         });
@@ -53,9 +52,9 @@
                     userJsonList.forEach(user => {
                         $('div.message_holder').append(
                             '<ul><li><b>Kullanıcı: </b>' + user.nick
-                            + '</li><li><b>Konum: </b>' + user.location
                             + '</li><li><b>Not: </b>' + user.note
-                            + '</li><li><b>Etiketler: </b>' + user.tags
+                            + '</li><li><b>Latitude: </b>' + user.latitude
+                            + '</li><li><b>Longitude: </b>' + user.longitude
                             + '</li><li><b>Süre(Sn): </b>' + user.time
                             + '</li><li><b>Başlama Zamanı: </b>' + user.starting_time
                             + '</li><li><b>Silinme Zamanı: </b>' + user.ending_time

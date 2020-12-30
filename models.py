@@ -80,28 +80,26 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     note = db.Column(db.Text)
     time = db.Column(db.Text)
-    location = db.Column(db.Text)
-    street = db.Column(db.Text)
-    city = db.Column(db.Text)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    def __init__(self, note, time, location, street, city, user_id):
+    def __init__(self, note, time, latitude, longitude, user_id):
         self.note = note
         self.time = time
-        self.location = location
-        self.street = street
-        self.city = city
+        self.latitude = latitude
+        self.longitude = longitude
         self.user_id = user_id
 
     def __repr__(self):
         return (
-            f"<Note id: %s note: %s time: %s location: %s street: %s city: %s user_id: %s>"
+            f"<Note id: %s note: %s time: %s latitude: %s longitude: %s city: %s user_id: %s>"
             % self.id
             % self.note
             % self.time
-            % self.location
-            % self.street
-            % self.city
+            % self.latitude
+            % self.longitude
             % self.user_id
         )
 

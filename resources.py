@@ -26,11 +26,11 @@ note_parser = reqparse.RequestParser()
 note_parser.add_argument(
     'nick', help='This field cannot be blank', required=True)
 note_parser.add_argument(
-    'location', help='This field cannot be blank', required=True)
+    'latitude', help='This field cannot be blank', required=True)
+note_parser.add_argument(
+    'longitude', help='This field cannot be blank', required=True)
 note_parser.add_argument(
     'note', help='This field cannot be blank', required=True)
-note_parser.add_argument(
-    'tags', help='This field cannot be blank', required=True)
 note_parser.add_argument(
     'time', help='This field cannot be blank', required=True)
 
@@ -42,7 +42,7 @@ def socketio_emit(name, message):
 
 
 class ShareNote(Resource):
-    @jwt_required
+    # @jwt_required
     def post(self):
         values = note_parser.parse_args()
 
@@ -55,9 +55,9 @@ class ShareNote(Resource):
 
         user_json = {
             'nick':  values['nick'],
-            'location': values['location'],
+            'latitude': values['latitude'],
+            'longitude': values['longitude'],
             'note': values['note'],
-            'tags': values['tags'],
             'time': values['time'],
             'starting_time': str(starting_time.strftime("%Y-%m-%d %H:%M:%S")),
             'ending_time': str(ending_time.strftime("%Y-%m-%d %H:%M:%S"))
@@ -66,6 +66,7 @@ class ShareNote(Resource):
         user_list.append(user_json)
         socketio_emit('user_event', user_list)
 
+        print('Post request has been successed.')
         return {'message': 'Post request has been successed.'}
 
     def get(self):
