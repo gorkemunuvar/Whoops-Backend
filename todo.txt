@@ -1,0 +1,15 @@
+*********************************
+ - Soketi web browserda çalıştır.
+ - Soketi mobilde çalıştır.
+*********************************
+
+ - isteklerden sonra http status döndür.
+ -  
+ {
+     "location": {
+         "latitude": 23.1231,
+         "longitude": 43.12312
+     }
+ }
+
+ - harita zoom edildiğinde api dan optimize bir şekilde notları döndür.

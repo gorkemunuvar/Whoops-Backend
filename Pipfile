@@ -12,6 +12,7 @@ flask-jwt-extended = "*"
 flask-restful = "*"
 passlib = "*"
 flask-migrate = "*"
+eventlet = "*"
 
 [dev-packages]
 

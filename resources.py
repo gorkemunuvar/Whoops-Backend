@@ -1,3 +1,5 @@
+import json
+from g_variables import user_list
 from datetime import datetime, timedelta
 from flask_restful import Resource, reqparse
 from flask import make_response, render_template, current_app
@@ -5,7 +7,6 @@ from models import User, RevokedTokenModel
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
-user_list = []
 
 user_parser = reqparse.RequestParser()
 user_parser.add_argument(
@@ -41,9 +42,27 @@ def socketio_emit(name, message):
     socketio.emit(name, message)
 
 
+class Test(Resource):
+    def get(self):
+        
+        user_dict = {'notes': user_list}
+        emitting_json = json.dumps(user_dict)
+
+        print("----------------test api----------------")
+        print(emitting_json)
+        print("-------------test api - end-------------")
+
+        socketio_emit('user_event', emitting_json)
+
+        return emitting_json
+
+
 class ShareNote(Resource):
-    # @jwt_required
+    #web browser tarafından post isteği yapabilmek için
+    #pasif kalmalı. Çünkü token gerekiyor.
+    #@jwt_required
     def post(self):
+        #handle database
         values = note_parser.parse_args()
 
         add_second = int(values['time'])
@@ -64,7 +83,17 @@ class ShareNote(Resource):
         }
 
         user_list.append(user_json)
-        socketio_emit('user_event', user_list)
+        user_dict = {'notes': user_list}
+        emitting_json = json.dumps(user_dict)
+
+        print("----------------emitting json / resources.py----------------")
+        print(emitting_json)
+        print("----------------emitting json----------------")
+
+        # I am using this line recently.
+        #json = '{"notes": ' + str(user_list) + '}'
+
+        socketio_emit('user_event', emitting_json)
 
         print('Post request has been successed.')
         return {'message': 'Post request has been successed.'}
@@ -109,6 +138,7 @@ class UserRegistration(Resource):
 
 
 class UserLogin(Resource):
+    @jwt_required
     def post(self):
         data = user_parser.parse_args()
         current_user = User.find_by_username(data['username'])

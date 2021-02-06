@@ -1,4 +1,6 @@
+import json
 from flask import Flask
+from task import scheduleTask
 from datetime import datetime
 from flask_restful import Api
 from flask_migrate import Migrate
@@ -18,7 +20,6 @@ db = SQLAlchemy(app)
 
 scheduler = APScheduler()
 socketio = SocketIO(app, logger=True)
-
 
 def handle_migration():
     # Unless models.py is not imported migration process
@@ -42,27 +43,21 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return models.RevokedTokenModel.is_jti_blacklisted(jti)
 
+@socketio.on('connect')
+def connect():
+    from g_variables import user_list
 
-def scheduleTask():
-    import resources
-
-    for user in resources.user_list:
-        current_time = datetime.now()
-        target_time = datetime.strptime(
-            user['ending_time'], '%Y-%m-%d %H:%M:%S')
-
-        if current_time >= target_time:
-            resources.user_list.remove(user)
-            socketio.emit('user_event', resources.user_list)
-
-            print("Deleteted: ", user)
-
+    print('A user connected.')
+    user_dict = {'notes': user_list}
+    emitting_json = json.dumps(user_dict)
+    socketio.emit('user_event', emitting_json)
 
 def set_apis():
     import models
     import resources
 
     api.add_resource(resources.HomePage, '/')
+    api.add_resource(resources.Test, '/test')
     api.add_resource(resources.UserRegistration, '/registration')
     api.add_resource(resources.UserLogin, '/login')
     api.add_resource(resources.ShareNote, '/sharenote')
@@ -71,17 +66,9 @@ def set_apis():
     api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
     api.add_resource(resources.TokenRefresh, '/token/refresh')
 
-
-@socketio.on('connect')
-def connect():
-    import resources
-    socketio.emit('user_event', resources.user_list)
-
-
 if __name__ == '__main__':
     set_apis()
 
-    scheduler.add_job(id='Scheduled Task', func=scheduleTask,
-                      trigger="interval", seconds=1)
+    scheduler.add_job(id='Scheduled Task', func=scheduleTask, trigger="interval", seconds=1)
     scheduler.start()
     socketio.run(app, debug=True, use_reloader=False)

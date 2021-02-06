@@ -44,13 +44,21 @@
 
         socket.on('connect', () => {
             socket.on('user_event', (userJsonList) => {
-                if (typeof userJsonList !== 'undefined') {
-                    $('h3').remove();
-                    //$('div.message_holder').remove();
-                    $div = document.getElementById("id_messageholder").innerHTML = "";
+                $('h3').remove();
+                //$('div.message_holder').remove();
+                $div = document.getElementById("id_messageholder").innerHTML = "";
 
-                    userJsonList.forEach(user => {
-                        $('div.message_holder').append(
+
+                console.log(userJsonList);
+                $('div.message_holder').append(userJsonList + "</br>");
+
+
+                if (typeof userJsonList !== 'undefined') {
+
+
+                    /* Object.keys(userJsonList).forEach(function (user) {
+
+                         $('div.message_holder').append(
                             '<ul><li><b>Kullanıcı: </b>' + user.nick
                             + '</li><li><b>Not: </b>' + user.note
                             + '</li><li><b>Latitude: </b>' + user.latitude
@@ -59,8 +67,10 @@
                             + '</li><li><b>Başlama Zamanı: </b>' + user.starting_time
                             + '</li><li><b>Silinme Zamanı: </b>' + user.ending_time
                             + '</li></ul>'
-                        );
-                    });
+                        ); 
+                    }); */
+
+
                 }
             });
         });
