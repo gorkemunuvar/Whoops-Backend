@@ -12,9 +12,9 @@ flask-jwt-extended = "*"
 flask-restful = "*"
 passlib = "*"
 flask-migrate = "*"
-eventlet = "*"
+gevent = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3.9.2"

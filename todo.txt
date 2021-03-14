@@ -13,3 +13,6 @@
  }
 
  - harita zoom edildiğinde api dan optimize bir şekilde notları döndür.
+
+ -VS Code Shortcut
+CTRL+K CTRL+C --- CTRL+K CTRL+U

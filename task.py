@@ -6,7 +6,6 @@ def socketio_emit(name, message):
     from __main__ import socketio
     socketio.emit(name, message)
     
-
 def scheduleTask():
     from g_variables import user_list
 

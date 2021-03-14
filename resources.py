@@ -5,7 +5,7 @@ from flask_restful import Resource, reqparse
 from flask import make_response, render_template, current_app
 from models import User, RevokedTokenModel
 from flask_jwt_extended import (create_access_token, create_refresh_token,
-                                jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+                                jwt_required, get_jwt_identity, get_jwt)
 
 
 user_parser = reqparse.RequestParser()
@@ -56,7 +56,6 @@ class Test(Resource):
 
         return emitting_json
 
-
 class ShareNote(Resource):
     #web browser tarafından post isteği yapabilmek için
     #pasif kalmalı. Çünkü token gerekiyor.
@@ -83,15 +82,14 @@ class ShareNote(Resource):
         }
 
         user_list.append(user_json)
-        user_dict = {'notes': user_list}
-        emitting_json = json.dumps(user_dict)
+        emitting_json = json.dumps({'notes': user_list})
 
         print("----------------emitting json / resources.py----------------")
         print(emitting_json)
         print("----------------emitting json----------------")
 
         # I am using this line recently.
-        #json = '{"notes": ' + str(user_list) + '}'
+        # json = '{"notes": ' + str(user_list) + '}'
 
         socketio_emit('user_event', emitting_json)
 
@@ -101,11 +99,9 @@ class ShareNote(Resource):
     def get(self):
         return make_response(render_template('share_note.html'))
 
-
 class HomePage(Resource):
     def get(self):
         return make_response(render_template('index.html'))
-
 
 class UserRegistration(Resource):
     def post(self):
@@ -160,12 +156,12 @@ class UserLogin(Resource):
 
 
 # revoke -> iptal etmek
-# Kullanıcı logout olduğunda token'ların blacklist'e eklenmesi gerekir.
+# Kullanıcı logout olduğunda token'ların blocklist'e eklenmesi gerekir.
 # Access token blacklist'e eklenir.
 class UserLogoutAccess(Resource):
     @jwt_required
     def post(self):
-        jti = get_raw_jwt()['jti']
+        jti = get_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
@@ -174,12 +170,10 @@ class UserLogoutAccess(Resource):
             return {'message': 'Something went wrong'}, 500
 
 # Burada ise refresh token blacklist'e eklenir.
-
-
 class UserLogoutRefresh(Resource):
-    @jwt_refresh_token_required
+    @jwt_required(refresh=True)
     def post(self):
-        jti = get_raw_jwt()['jti']
+        jti = get_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
@@ -187,14 +181,12 @@ class UserLogoutRefresh(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
-
 class TokenRefresh(Resource):
-    @jwt_refresh_token_required
+    @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
         access_token = create_access_token(identity=current_user)
         return {'access_token': access_token}
-
 
 class AllUsers(Resource):
     def get(self):
