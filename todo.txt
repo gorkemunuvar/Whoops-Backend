@@ -1,9 +1,11 @@
 *********************************
- - Soketi web browserda çalıştır.
- - Soketi mobilde çalıştır.
+[DONE] - Soketi web browserda çalıştır.
+[DONE] - Soketi mobilde çalıştır.
+[DONE] - Sunucudan gelen veri ile mobile marker çizdir.
+
 *********************************
 
- - isteklerden sonra http status döndür.
+ - isteklerden sonra http status döndür.    
  -  
  {
      "location": {
@@ -13,6 +15,8 @@
  }
 
  - harita zoom edildiğinde api dan optimize bir şekilde notları döndür.
+
+*********************************
 
  -VS Code Shortcut
 CTRL+K CTRL+C --- CTRL+K CTRL+U

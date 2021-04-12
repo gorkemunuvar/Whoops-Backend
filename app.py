@@ -62,6 +62,7 @@ def set_apis():
 
     api.add_resource(resources.HomePage, '/')
     api.add_resource(resources.Test, '/test')
+    api.add_resource(resources.Emit, '/emit')
     api.add_resource(resources.UserRegistration, '/registration')
     api.add_resource(resources.UserLogin, '/login')
     api.add_resource(resources.ShareNote, '/sharenote')

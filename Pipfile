@@ -12,7 +12,7 @@ flask-jwt-extended = "*"
 flask-restful = "*"
 passlib = "*"
 flask-migrate = "*"
-gevent = "*"
+gevent-websocket = "*"
 
 [dev-packages]
 

@@ -44,7 +44,7 @@ def socketio_emit(name, message):
 
 class Test(Resource):
     def get(self):
-        
+
         user_dict = {'notes': user_list}
         emitting_json = json.dumps(user_dict)
 
@@ -56,12 +56,45 @@ class Test(Resource):
 
         return emitting_json
 
+
+test_list = []
+
+
+class Emit(Resource):
+    def get(self):
+        user_json = {
+            'nick':  'nick',
+            'latitude': 13.91,
+            'longitude': 14.91,
+            'note': 'note',
+            'time': 10,
+            'starting_time': '2231321213',
+            'ending_time': '216546165165'
+        }
+
+        test_list.append(user_json)
+
+        emitting_json = json.dumps({'notes': test_list})
+
+        print("----------------emitting json / resources.py----------------")
+        print(emitting_json)
+        print("----------------emitting json----------------")
+
+        # I am using this line recently.
+        # json = '{"notes": ' + str(user_list) + '}'
+
+        socketio_emit('user_event', emitting_json)
+
+        print('Emit process is successed.')
+        return {'message': 'Emit request has been successed.'}
+
+
 class ShareNote(Resource):
-    #web browser tarafından post isteği yapabilmek için
-    #pasif kalmalı. Çünkü token gerekiyor.
-    #@jwt_required
+    # web browser tarafından post isteği yapabilmek için
+    # pasif kalmalı. Çünkü token gerekiyor.
+    # @jwt_required
     def post(self):
-        #handle database
+        # handle database
         values = note_parser.parse_args()
 
         add_second = int(values['time'])
@@ -99,9 +132,11 @@ class ShareNote(Resource):
     def get(self):
         return make_response(render_template('share_note.html'))
 
+
 class HomePage(Resource):
     def get(self):
         return make_response(render_template('index.html'))
+
 
 class UserRegistration(Resource):
     def post(self):
@@ -170,6 +205,8 @@ class UserLogoutAccess(Resource):
             return {'message': 'Something went wrong'}, 500
 
 # Burada ise refresh token blacklist'e eklenir.
+
+
 class UserLogoutRefresh(Resource):
     @jwt_required(refresh=True)
     def post(self):
@@ -181,12 +218,14 @@ class UserLogoutRefresh(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
+
 class TokenRefresh(Resource):
     @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
         access_token = create_access_token(identity=current_user)
         return {'access_token': access_token}
+
 
 class AllUsers(Resource):
     def get(self):
