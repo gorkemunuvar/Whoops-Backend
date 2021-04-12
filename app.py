@@ -1,4 +1,5 @@
 import json
+from db import db
 from flask import Flask
 from task import scheduleTask
 from datetime import datetime
@@ -16,20 +17,23 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'some-secret-string'
 
-db = SQLAlchemy(app)
+#db = SQLAlchemy(app)
 
 scheduler = APScheduler()
 socketio = SocketIO(app, logger=True)
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
-def handle_migration():
+#def handle_migration():
     # Unless models.py is not imported migration process
     # doesn't detect tables correctly.
-    import models
-    migrate = Migrate(app, db)
+    #import models
+    #migrate = Migrate(app, db)
 
 
-handle_migration()
+#handle_migration()
 
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 jwt = JWTManager(app)
@@ -38,12 +42,13 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
 
-#it is called every time when the clients try to access secured endpoints
+#it is called every time when clients try to access secured endpoints
 @jwt.token_in_blocklist_loader
-def check_if_token_in_blacklist(decrypted_token):
-    import models
+#i added 'self' to solve an error
+def check_if_token_in_blacklist(self, decrypted_token):
+    import old_models
     jti = decrypted_token['jti']
-    return models.RevokedTokenModel.is_jti_blacklisted(jti)
+    return old_models.RevokedTokenModel.is_jti_blacklisted(jti)
 
 
 @socketio.on('connect')
@@ -57,7 +62,7 @@ def connect():
 
 
 def set_apis():
-    import models
+    import old_models
     import resources
 
     api.add_resource(resources.HomePage, '/')
@@ -73,6 +78,7 @@ def set_apis():
 
 
 if __name__ == '__main__':
+    db.init_app(app)
     set_apis()
 
     scheduler.add_job(id='Scheduled Task', func=scheduleTask,

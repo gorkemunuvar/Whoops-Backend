@@ -3,24 +3,32 @@ from g_variables import user_list
 from datetime import datetime, timedelta
 from flask_restful import Resource, reqparse
 from flask import make_response, render_template, current_app
-from models import User, RevokedTokenModel
+from models.user import User
+from old_models import RevokedTokenModel
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 jwt_required, get_jwt_identity, get_jwt)
 
 
-user_parser = reqparse.RequestParser()
-user_parser.add_argument(
+signup_parser = reqparse.RequestParser()
+signup_parser.add_argument(
     'username', help='This field cannot be blank', required=True)
-user_parser.add_argument(
+signup_parser.add_argument(
     'password', help='This field cannot be blank', required=True)
-user_parser.add_argument(
+signup_parser.add_argument(
     'nick', help='This field cannot be blank', required=True)
-user_parser.add_argument(
+signup_parser.add_argument(
     'name', help='This field cannot be blank', required=True)
-user_parser.add_argument(
+signup_parser.add_argument(
     'surname', help='This field cannot be blank', required=True)
-user_parser.add_argument(
+signup_parser.add_argument(
     'email', help='This field cannot be blank', required=True)
+
+
+login_parser = reqparse.RequestParser()
+login_parser.add_argument(
+    'username', help='This field cannot be blank', required=True)
+login_parser.add_argument(
+    'password', help='This field cannot be blank', required=True)
 
 
 note_parser = reqparse.RequestParser()
@@ -43,6 +51,7 @@ def socketio_emit(name, message):
 
 
 class Test(Resource):
+    @jwt_required()
     def get(self):
 
         user_dict = {'notes': user_list}
@@ -92,7 +101,7 @@ class Emit(Resource):
 class ShareNote(Resource):
     # web browser tarafından post isteği yapabilmek için
     # pasif kalmalı. Çünkü token gerekiyor.
-    # @jwt_required
+    # @jwt_required()
     def post(self):
         # handle database
         values = note_parser.parse_args()
@@ -140,7 +149,7 @@ class HomePage(Resource):
 
 class UserRegistration(Resource):
     def post(self):
-        data = user_parser.parse_args()
+        data = signup_parser.parse_args()
 
         if User.find_by_username(data['username']):
             return {'message': 'User {} already exists'.format(data['username'])}
@@ -156,7 +165,9 @@ class UserRegistration(Resource):
 
         try:
             new_user.save_to_db()
-            access_token = create_access_token(identity=data['username'])
+            access_token = create_access_token(
+                identity=data['username'],
+                expires_delta=False)
             refresh_token = create_refresh_token(identity=data['username'])
 
             return {
@@ -169,16 +180,17 @@ class UserRegistration(Resource):
 
 
 class UserLogin(Resource):
-    @jwt_required
     def post(self):
-        data = user_parser.parse_args()
+        data = login_parser.parse_args()
         current_user = User.find_by_username(data['username'])
 
         if not current_user:
             return {'message': 'User {} doesn\'t exist'.format(data['username'])}
 
         if User.verify_hash(data['password'], current_user.password):
-            access_token = create_access_token(identity=data['username'])
+            access_token = create_access_token(
+                identity=data['username'],
+                expires_delta=False)
             refresh_token = create_refresh_token(identity=data['username'])
 
             return {
@@ -194,7 +206,7 @@ class UserLogin(Resource):
 # Kullanıcı logout olduğunda token'ların blocklist'e eklenmesi gerekir.
 # Access token blacklist'e eklenir.
 class UserLogoutAccess(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         jti = get_jwt()['jti']
         try:
