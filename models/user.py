@@ -1,7 +1,8 @@
 from db import db
 from passlib.hash import pbkdf2_sha256 as sha256
 
-class User(db.Model):
+
+class UserModel(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -11,9 +12,9 @@ class User(db.Model):
     name = db.Column(db.String(40), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    notes = db.relationship(
-        "Note", backref="user", cascade="all, delete, delete-orphan", lazy=True
-    )
+    # whoops = db.relationship(
+    #     "Whoop", backref="user", cascade="all, delete, delete-orphan", lazy=True,
+    # )
 
     def __init__(self, username, password, nick, name, surname, email):
         self.username = username
@@ -53,7 +54,7 @@ class User(db.Model):
                 'surname': x.surname,
                 'email': x.email,
             }
-        return {'users': list(map(lambda x: to_json(x), User.query.all()))}
+        return {'users': list(map(lambda x: to_json(x), UserModel.query.all()))}
 
     @classmethod
     def delete_all(cls):
