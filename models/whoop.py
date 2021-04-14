@@ -1,5 +1,6 @@
 from db import db
 
+
 class WhoopModel(db.Model):
     __tablename__ = "note"
 

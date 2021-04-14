@@ -13,6 +13,7 @@ flask-restful = "*"
 passlib = "*"
 flask-migrate = "*"
 gevent-websocket = "*"
+black = "*"
 
 [dev-packages]
 
