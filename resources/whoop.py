@@ -15,8 +15,9 @@ def socketio_emit(name, message):
 
 
 class ShareWhoop(Resource):
+    @classmethod
     # @jwt_required()
-    def post(self):
+    def post(cls):
         values = whoop_parser.parse_args()
 
         add_second = int(values["time"])

@@ -13,6 +13,7 @@ def socketio_emit(name: str, message: str) -> None:
 
 
 class Test(Resource):
+    @classmethod
     @jwt_required()
     def get(self):
 

@@ -11,7 +11,8 @@ from helpers.reqparse_helper import signin_parser, signup_parser
 
 
 class UserSignin(Resource):
-    def post(self):
+    @classmethod
+    def post(cls):
         values = signin_parser.parse_args()
         current_user = UserModel.find_by_username(values["username"])
 
@@ -34,7 +35,8 @@ class UserSignin(Resource):
 
 
 class UserSignup(Resource):
-    def post(self):
+    @classmethod
+    def post(cls):
         values = signup_parser.parse_args()
 
         if UserModel.find_by_username(values["username"]):
@@ -67,10 +69,12 @@ class UserSignup(Resource):
 
 
 class AllUsers(Resource):
-    def get(self):
+    @classmethod
+    def get(cls):
         return UserModel.return_all()
 
-    def delete(self):
+    @classmethod
+    def delete(cls):
         return UserModel.delete_all()
 
 
@@ -78,8 +82,9 @@ class AllUsers(Resource):
 # Kullanıcı logout olduğunda token'ların blocklist'e eklenmesi gerekir.
 # Access token blocklist'e eklenir.
 class UserLogoutAccess(Resource):
+    @classmethod
     @jwt_required()
-    def post(self):
+    def post(cls):
         jti = get_jwt()["jti"]
         try:
             revoked_token = RevokedTokenModel(jti=jti)
@@ -90,11 +95,10 @@ class UserLogoutAccess(Resource):
 
 
 # Burada ise refresh token blacklist'e eklenir.
-
-
 class UserLogoutRefresh(Resource):
+    @classmethod
     @jwt_required(refresh=True)
-    def post(self):
+    def post(cls):
         jti = get_jwt()["jti"]
         try:
             revoked_token = RevokedTokenModel(jti=jti)
