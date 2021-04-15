@@ -48,8 +48,18 @@ class UserModel(db.Model):
         return cls.query.filter_by(username=username).first()
 
     @classmethod
-    def find_all(cls) -> List["UserModel"]:
-        return cls.query.all()
+    def return_all(cls) -> List["UserModel"]:
+        def to_json(user):
+            return {
+                'username': user.username,
+                'password': user.password,
+                'nick': user.nick,
+                'name': user.name,
+                'surname': user.surname,
+                'email': user.email,
+            }
+
+        return {'users': list(map(lambda user: to_json(user), UserModel.query.all()))}
 
     @classmethod
     def delete_all(cls) -> Dict[str, str]:
