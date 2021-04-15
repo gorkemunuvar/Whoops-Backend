@@ -1,5 +1,9 @@
 from db import db
+from typing import Dict, List, Union
 
+# keys are string
+# values are union
+WhoopJSON = Dict[str, Union[int, str, int, float, float, int]]
 
 class WhoopModel(db.Model):
     __tablename__ = "note"
@@ -12,20 +16,19 @@ class WhoopModel(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    def __init__(self, note, time, latitude, longitude, user_id):
+    def __init__(self, note: str, time: int, latitude: float, longitude: float, user_id: int):
         self.note = note
         self.time = time
         self.latitude = latitude
         self.longitude = longitude
         self.user_id = user_id
 
-    def __repr__(self):
-        return (
-            f"<Note id: %s note: %s time: %s latitude: %s longitude: %s city: %s user_id: %s>"
-            % self.id
-            % self.note
-            % self.time
-            % self.latitude
-            % self.longitude
-            % self.user_id
-        )
+    def json(self) -> WhoopJSON:
+        return {
+            "id": self.id,
+            "note": self.note,
+            "time": self.time,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "user_id": self.user_id,
+        }

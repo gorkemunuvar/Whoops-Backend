@@ -9,7 +9,7 @@ def socketio_emit(name, message):
     socketio.emit(name, message)
 
 
-def scheduleTask():
+def scheduleTask() -> None:
     from g_variables import user_list
 
     for user in user_list:

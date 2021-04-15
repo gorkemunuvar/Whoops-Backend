@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required
 from g_variables import user_list
 
 
-def socketio_emit(name, message):
+def socketio_emit(name: str, message: str) -> None:
     # 'from app' does not work
     from __main__ import socketio
 

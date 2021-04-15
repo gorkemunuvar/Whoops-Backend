@@ -6,7 +6,6 @@ from flask_jwt_extended import (
     get_jwt_identity,
     get_jwt,
 )
-
 from models.user import UserModel
 from helpers.reqparse_helper import signin_parser, signup_parser
 
