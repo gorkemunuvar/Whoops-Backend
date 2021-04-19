@@ -1,7 +1,7 @@
 import json
 from db import db
-from flask import Flask
 from datetime import datetime
+from flask import Flask, jsonify
 from flask_socketio import SocketIO
 
 from flask_restful import Api
@@ -11,20 +11,23 @@ from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
 
 from helpers.task import scheduleTask
+from models.revoken_token import RevokedTokenModel
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "some-secret-string"
+app.config["SECRET_KEY"] = "appsecretkey"
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
-app.config["JWT_SECRET_KEY"] = "jwt-secret-string"
+app.config["JWT_SECRET_KEY"] = "jwtsecretkey"
 app.config["JWT_BLACKLIST_ENABLED"] = True
 app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
 
 
 socketio = SocketIO(app, logger=True)
 jwt = JWTManager(app)
+api = Api(app)
 
 
 @app.before_first_request
@@ -32,15 +35,46 @@ def create_tables():
     db.create_all()
 
 
-# it is called every time when clients try to access secured endpoints
+# This methods called every time when clients try to access secured endpoints
+# It will check if a token is blacklisted.
 @jwt.token_in_blocklist_loader
-# i added 'self' to solve an error
-def check_if_token_in_blacklist(self, decrypted_token):
-    from models.revoken_token import RevokedTokenModel
-
-    jti = decrypted_token["jti"]
-
+def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    # jti means identity
+    jti = jwt_payload["jti"]
     return RevokedTokenModel.is_jti_blacklisted(jti)
+
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        'message': 'The token has expired.',
+        'error': 'token_expired'
+    }), 401
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({
+        'message': 'Signature verification failed.',
+        'error': 'invalid_token'
+    }), 401
+
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify({
+        "description": "Request does not contain an access token.",
+        'error': 'authorization_required'
+    }), 401
+
+# I'll use required fresh token func.
+# on the Change Password Acreen
+@jwt.needs_fresh_token_loader
+def token_not_fresh_callback():
+    return jsonify({
+        "description": "The token is not fresh.",
+        'error': 'fresh_token_required'
+    }), 401
 
 
 @socketio.on("connect")
@@ -60,20 +94,23 @@ def set_api():
     from resources.user import (
         UserSignin,
         UserSignup,
-        UserLogoutAccess,
-        UserLogoutRefresh,
+        UserLogout,
         AllUsers,
     )
 
-    api = Api(app)
-
+    # user resources
     api.add_resource(UserSignin, "/signin")
     api.add_resource(UserSignup, "/signup")
-    api.add_resource(UserLogoutAccess, "/logout/access")
-    api.add_resource(UserLogoutRefresh, "/logout/refresh")
+    api.add_resource(UserLogout, "/logout")
     api.add_resource(AllUsers, "/users")
+
+    # test resources
     api.add_resource(Test, "/test")
+
+    # whoop resources
     api.add_resource(ShareWhoop, "/sharewhoop")
+
+    # token resources
     api.add_resource(TokenRefresh, "/token/refresh")
 
 

@@ -6,6 +6,7 @@ class TokenRefresh(Resource):
     @classmethod
     @jwt_required(refresh=True)
     def post(self):
-        current_user = get_jwt_identity()
-        access_token = create_access_token(identity=current_user)
-        return {"access_token": access_token}
+        current_user_id = get_jwt_identity()
+        new_access_token = create_access_token(identity=current_user_id, fresh=False)
+
+        return {"access_token": new_access_token}, 200

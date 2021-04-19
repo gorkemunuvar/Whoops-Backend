@@ -1,3 +1,4 @@
+import datetime
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token,
@@ -7,31 +8,8 @@ from flask_jwt_extended import (
     get_jwt,
 )
 from models.user import UserModel
+from models.revoken_token import RevokedTokenModel
 from helpers.reqparse_helper import signin_parser, signup_parser
-
-
-class UserSignin(Resource):
-    @classmethod
-    def post(cls):
-        values = signin_parser.parse_args()
-        current_user = UserModel.find_by_username(values["username"])
-
-        if not current_user:
-            return {"message": "User {} doesn't exist".format(values["username"])}
-
-        if UserModel.verify_hash(values["password"], current_user.password):
-            access_token = create_access_token(
-                identity=values["username"], expires_delta=False
-            )
-            refresh_token = create_refresh_token(identity=values["username"])
-
-            return {
-                "message": "Logged in as {}".format(current_user.username),
-                "access_token": access_token,
-                "refresh_token": refresh_token,
-            }
-        else:
-            return {"message": "Wrong credentials"}
 
 
 class UserSignup(Resource):
@@ -39,33 +17,47 @@ class UserSignup(Resource):
     def post(cls):
         values = signup_parser.parse_args()
 
-        if UserModel.find_by_username(values["username"]):
-            return {"message": "User {} already exists".format(values["username"])}
+        if UserModel.find_by_email(values["email"]):
+            return {"message": "A user with that email already exists."}, 400
 
         new_user = UserModel(
-            username=values["username"],
-            password=UserModel.generate_hash(values["password"]),
-            nick=values["nick"],
-            name=values["name"],
-            surname=values["surname"],
             email=values["email"],
+            password=UserModel.generate_hash(values["password"]),
         )
-
         try:
             new_user.save_to_db()
 
+            return {
+                "message": "User {} was created".format(values["email"]),
+            }, 201
+        except:
+            return {"message": "Something went wrong"}, 500
+
+
+class UserSignin(Resource):
+    @classmethod
+    def post(cls):
+        values = signin_parser.parse_args()
+        current_user = UserModel.find_by_email(values["email"])
+
+        if not current_user:
+            return {"message": "User {} doesn't exist".format(values["email"])}
+
+        if UserModel.verify_hash(values["password"], current_user.password):
             access_token = create_access_token(
-                identity=values["username"], expires_delta=False
+                identity=current_user.id,
+                expires_delta=datetime.timedelta(minutes=60),
+                fresh=True
             )
-            refresh_token = create_refresh_token(identity=values["username"])
+            refresh_token = create_refresh_token(identity=values["email"])
 
             return {
-                "message": "User {} was created".format(values["username"]),
+                "message": "Logged in as {}".format(current_user.email),
                 "access_token": access_token,
                 "refresh_token": refresh_token,
             }
-        except:
-            return {"message": "Something went wrong"}, 500
+        else:
+            return {"message": "Wrong credentials"}
 
 
 class AllUsers(Resource):
@@ -78,31 +70,14 @@ class AllUsers(Resource):
         return UserModel.delete_all()
 
 
-# revoke -> iptal etmek
-# Kullanıcı logout olduğunda token'ların blocklist'e eklenmesi gerekir.
-# Access token blocklist'e eklenir.
-class UserLogoutAccess(Resource):
+class UserLogout(Resource):
     @classmethod
     @jwt_required()
     def post(cls):
-        jti = get_jwt()["jti"]
+        jti = get_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
-            return {"message": "Access token has been revoked"}
-        except:
-            return {"message": "Something went wrong"}, 500
-
-
-# Burada ise refresh token blacklist'e eklenir.
-class UserLogoutRefresh(Resource):
-    @classmethod
-    @jwt_required(refresh=True)
-    def post(cls):
-        jti = get_jwt()["jti"]
-        try:
-            revoked_token = RevokedTokenModel(jti=jti)
-            revoked_token.add()
-            return {"message": "Refresh token has been revoked"}
+            return {"message": "User logged out and access token has been revoked."}
         except:
             return {"message": "Something went wrong"}, 500
