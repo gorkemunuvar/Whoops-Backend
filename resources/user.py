@@ -1,3 +1,4 @@
+import json
 import datetime
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
@@ -41,7 +42,7 @@ class UserSignin(Resource):
         current_user = UserModel.find_by_email(values["email"])
 
         if not current_user:
-            return {"message": "User {} doesn't exist".format(values["email"])}
+            return {"message": "User {} doesn't exist".format(values["email"])}, 404
 
         if UserModel.verify_hash(values["password"], current_user.password):
             access_token = create_access_token(
@@ -55,9 +56,9 @@ class UserSignin(Resource):
                 "message": "Logged in as {}".format(current_user.email),
                 "access_token": access_token,
                 "refresh_token": refresh_token,
-            }
+            }, 201
         else:
-            return {"message": "Wrong credentials"}
+            return {"message": "Wrong credentials"}, 401
 
 
 class AllUsers(Resource):
