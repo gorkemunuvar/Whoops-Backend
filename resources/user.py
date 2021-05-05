@@ -75,10 +75,12 @@ class UserLogout(Resource):
     @classmethod
     @jwt_required()
     def post(cls):
+        # jti is the identity for JWT
         jti = get_jwt()['jti']
         try:
             revoked_token = RevokedTokenModel(jti=jti)
             revoked_token.add()
-            return {"message": "User logged out and access token has been revoked."}
+            return {"message": "User logged out and access token has been revoked."}, 200
         except:
             return {"message": "Something went wrong"}, 500
+

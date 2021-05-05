@@ -69,6 +69,8 @@ def missing_token_callback(error):
 
 # I'll use required fresh token func.
 # on the Change Password Acreen
+
+
 @jwt.needs_fresh_token_loader
 def token_not_fresh_callback():
     return jsonify({
@@ -89,8 +91,8 @@ def connect():
 
 def set_api():
     from resources.test import Test
-    from resources.token import TokenRefresh
     from resources.whoop import ShareWhoop
+    from resources.token import TokenRefresh, TokenBlacklist
     from resources.user import (
         UserSignin,
         UserSignup,
@@ -112,6 +114,7 @@ def set_api():
 
     # token resources
     api.add_resource(TokenRefresh, "/token/refresh")
+    api.add_resource(TokenBlacklist, "/token/is_token_blacklisted")
 
 
 if __name__ == "__main__":
