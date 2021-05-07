@@ -47,4 +47,4 @@ class ShareWhoop(Resource):
         socketio_emit("user_event", emitting_json)
         print("Post request has been successed.")
 
-        return {"message": "Post request has been successed."}
+        return {"message": "Post request has been successed."}, 200

@@ -110,7 +110,7 @@ def set_api():
     api.add_resource(Test, "/test")
 
     # whoop resources
-    api.add_resource(ShareWhoop, "/sharewhoop")
+    api.add_resource(ShareWhoop, "/whoop/share")
 
     # token resources
     api.add_resource(TokenRefresh, "/token/refresh")

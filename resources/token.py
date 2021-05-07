@@ -16,22 +16,19 @@ class TokenRefresh(Resource):
 # This resource returns true if the user logged out before
 # So mobile app can check if the user is logged out before
 
+
 parser = reqparse.RequestParser()
 parser.add_argument("access_token", required=True,
                     help='You need to fill access_token')
 
 
 class TokenBlacklist(Resource):
-    #@jwt_required()
     @classmethod
     def post(cls):
-        #jti = get_jwt()['jti']
-        
         data = parser.parse_args()
         jwt = data['access_token']
 
         jti = get_jti(jwt)
-        print('jti = ', jti)
 
         revoked_token = RevokedTokenModel(jti=jti)
         isTokenRevoked = revoked_token.is_jti_blacklisted(jti)
