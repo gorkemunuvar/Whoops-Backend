@@ -12,8 +12,7 @@ signin_parser.add_argument("password",  required=True, help=BLANK_ERROR.format('
 signup_parser.add_argument("email", required=True, help=BLANK_ERROR.format('email'))
 signup_parser.add_argument("password", required=True, help=BLANK_ERROR.format('password'))
 
-whoop_parser.add_argument("nick", required=True, help=BLANK_ERROR.format('nick'))
+whoop_parser.add_argument("whoop_title", required=True, help=BLANK_ERROR.format('note'))
 whoop_parser.add_argument("latitude", required=True, help=BLANK_ERROR.format('latitude'))
 whoop_parser.add_argument("longitude", required=True, help=BLANK_ERROR.format('longitude'))
-whoop_parser.add_argument("note", required=True, help=BLANK_ERROR.format('note'))
 whoop_parser.add_argument("time", required=True, help=BLANK_ERROR.format('time'))

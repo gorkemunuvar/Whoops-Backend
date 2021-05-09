@@ -22,7 +22,7 @@ def scheduleTask() -> None:
             user_list.remove(user)
             print("Deleteted: ", user)
 
-            user_dict = {"notes": user_list}
+            user_dict = {"whoops": user_list}
             emitting_json = json.dumps(user_dict)
 
             socketio_emit("user_event", emitting_json)

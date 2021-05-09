@@ -44,10 +44,13 @@ class UserSignin(Resource):
         if not current_user:
             return {"message": "User {} doesn't exist".format(values["email"])}, 404
 
+        # Expire süresi False olmazsa client tarafında token expire olduğunda örneğin ShareWhoop
+        # endpointine istek atıldığında auth. problemi oluyor. Böyle durumlarda tekrarda refresh
+        # token yapılmalı.
         if UserModel.verify_hash(values["password"], current_user.password):
             access_token = create_access_token(
                 identity=current_user.id,
-                expires_delta=datetime.timedelta(minutes=60),
+                expires_delta=False,
                 fresh=True
             )
             refresh_token = create_refresh_token(identity=values["email"])
@@ -83,4 +86,3 @@ class UserLogout(Resource):
             return {"message": "User logged out and access token has been revoked."}, 200
         except:
             return {"message": "Something went wrong"}, 500
-

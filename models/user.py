@@ -21,12 +21,16 @@ class UserModel(db.Model):
         self.email = email
         self.password = password
 
-    def json(self, name: str) -> UserJSON:
+    def json(self) -> UserJSON:
         return {"email": self.email}
 
     def save_to_db(self) -> None:
         db.session.add(self)
         db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id: str) -> "UserModel":
+        return cls.query.filter_by(id=id).first()
 
     @classmethod
     def find_by_email(cls, email: str) -> "UserModel":

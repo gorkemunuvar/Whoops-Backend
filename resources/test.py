@@ -17,7 +17,7 @@ class Test(Resource):
     @jwt_required()
     def get(self):
 
-        user_dict = {"notes": user_list}
+        user_dict = {"whoops": user_list}
         emitting_json = json.dumps(user_dict)
 
         print("----------------test api----------------")

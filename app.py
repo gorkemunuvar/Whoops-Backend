@@ -84,7 +84,7 @@ def connect():
     from g_variables import user_list
 
     print("A user connected.")
-    user_dict = {"notes": user_list}
+    user_dict = {"whoops": user_list}
     emitting_json = json.dumps(user_dict)
     socketio.emit("user_event", emitting_json)
 
