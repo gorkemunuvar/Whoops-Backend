@@ -1,31 +1,23 @@
 from db import db
-from typing import Dict, List, Union
+from typing import List
 from passlib.hash import pbkdf2_sha256 as sha256
-
-# keys are string
-# values are union
-UserJSON = Dict[str, Union[int, str, str, str, str, str]]
-
 
 class UserModel(db.Model):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(120), nullable=False)
     # whoops = db.relationship(
     #     "Whoop", backref="user", cascade="all, delete, delete-orphan", lazy=True,
     # )
 
-    def __init__(self, email: str, password: str):
-        self.email = email
-        self.password = password
-
-    def json(self) -> UserJSON:
-        return {"email": self.email}
-
     def save_to_db(self) -> None:
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self) -> None:
+        db.session.delete(self)
         db.session.commit()
 
     @classmethod
@@ -37,24 +29,8 @@ class UserModel(db.Model):
         return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def return_all(cls) -> List["UserModel"]:
-        def to_json(user):
-            return {
-                'email': user.email,
-                'password': user.password,
-            }
-
-        return {'users': list(map(lambda user: to_json(user), UserModel.query.all()))}
-
-    @classmethod
-    def delete_all(cls) -> Dict[str, str]:
-        try:
-            num_rows_deleted = db.session.query(cls).delete()
-            db.session.commit()
-
-            return {"message": "{} row(s) deleted".format(num_rows_deleted)}
-        except:
-            return {"message": "Something went wrong"}
+    def find_all(cls) -> List['UserModel']:
+        return cls.query.all()
 
     @staticmethod
     def generate_hash(password: str) -> str:

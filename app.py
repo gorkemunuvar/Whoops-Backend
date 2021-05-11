@@ -10,6 +10,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
 
+from ma import ma
+from marshmallow import ValidationError
+
 from helpers.task import scheduleTask
 from models.revoken_token import RevokedTokenModel
 
@@ -33,6 +36,10 @@ api = Api(app)
 @app.before_first_request
 def create_tables():
     db.create_all()
+
+@app.errorhandler(ValidationError)
+def handle_marshmallow_validation_error(err):
+    return jsonify(err.messages), 400
 
 
 # This methods called every time when clients try to access secured endpoints
@@ -94,6 +101,7 @@ def set_api():
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
     from resources.user import (
+        User,
         UserSignin,
         UserSignup,
         UserLogout,
@@ -101,6 +109,7 @@ def set_api():
     )
 
     # user resources
+    api.add_resource(User, "/user/<int:user_id>")
     api.add_resource(UserSignin, "/signin")
     api.add_resource(UserSignup, "/signup")
     api.add_resource(UserLogout, "/logout")
@@ -119,6 +128,7 @@ def set_api():
 
 if __name__ == "__main__":
     db.init_app(app)
+    ma.init_app(app)
     set_api()
     scheduler = APScheduler()
 

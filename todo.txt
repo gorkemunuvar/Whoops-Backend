@@ -1,5 +1,8 @@
- - isteklerden sonra http status döndür.    
- -  
+ - Whoop Model netleştiğinde whoop schema oluştur.
+
+
+*********************************
+
  {
      "location": {
          "latitude": 23.1231,
