@@ -1,0 +1,7 @@
+- Eğer db silinirse fakat mobil uygulama tarafında geçerli bir jwt ile login olunursa
+  jwtrequired olan bir api'ye istek hala gönderilebilir. Fakat jwt id'den kullanıcı bilgisi
+  db'den bulunamayacağından hata ortaya çıkabilir.
+
+- Backend'de db yi silip sıfırdan oluştursam bile mobil tarafta kayıtlı token var ise jwt geçerli olduğu için
+  uygulama hala login olaliyor. DB'nin gerçekte silinmesi söz konusu olmasa da belki problem olabilir. Örneğin
+  mobil tarafta jwt'ye ait kullanıcı db'de var mı yok mu kontrol edilebilir. 

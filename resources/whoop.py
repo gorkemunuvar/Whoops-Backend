@@ -1,12 +1,14 @@
 import json
+from flask import request
 from flask_restful import Resource
 from datetime import datetime, timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from g_variables import user_list
-from helpers.reqparse_helper import whoop_parser
+from g_variables import whoop_list
 from models.user import UserModel
+from schemas.whoop import WhoopSchema
 
+whoop_schema = WhoopSchema()
 
 def socketio_emit(name, message):
     # from app does not work
@@ -19,32 +21,36 @@ class ShareWhoop(Resource):
     @classmethod
     @jwt_required()
     def post(cls):
-        values = whoop_parser.parse_args()
+        whoop_json = request.get_json()
+        whoop = whoop_schema.load(whoop_json)
 
-        add_second = int(values["time"])
+        add_second = int(whoop_json["time"])
         starting_time = datetime.now()
         # days, seconds, then other fields.
         ending_time = starting_time + timedelta(0, add_second)
 
-        print(values)
+        print(whoop_json)
 
         user_jwt_id = get_jwt_identity()
         user = UserModel.find_by_id(user_jwt_id)
 
-        print(user.json())
+        if user is None:
+            print("(Resource: ShareWhoop) User not found by id. ")
+            print("Try to log out and login again.")
+            return {"message": "User not found by id."}, 404
 
-        user_json = {
-            "user_email": user.email,
-            "whoop_title": values["whoop_title"],
-            "latitude": values["latitude"],
-            "longitude": values["longitude"],
-            "time": values["time"],
-            "starting_time": str(starting_time.strftime("%Y-%m-%d %H:%M:%S")),
-            "ending_time": str(ending_time.strftime("%Y-%m-%d %H:%M:%S")),
-        }
+        whoop.user_id = user.id
+        whoop.starting_time = str(starting_time.strftime("%Y-%m-%d %H:%M:%S"))
+        whoop.ending_time = str(ending_time.strftime("%Y-%m-%d %H:%M:%S"))
 
-        user_list.append(user_json)
-        emitting_json = json.dumps({"whoops": user_list})
+        whoop.save_to_db()
+
+        print(user)
+
+        whoop_dict = whoop_schema.dump(whoop)
+        whoop_list.append(whoop_dict)
+
+        emitting_json = json.dumps({"whoops": whoop_list})
 
         print("----------------emitting json / resources.py----------------")
         print(emitting_json)
@@ -54,3 +60,5 @@ class ShareWhoop(Resource):
         print("Post request has been successed.")
 
         return {"message": "Post request has been successed."}, 200
+        
+

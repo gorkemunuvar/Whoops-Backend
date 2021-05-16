@@ -10,20 +10,20 @@ def socketio_emit(name, message):
 
 
 def scheduleTask() -> None:
-    from g_variables import user_list
+    from g_variables import whoop_list
 
-    for user in user_list:
+    for whoop in whoop_list:
         current_time = datetime.now()
-        target_time = datetime.strptime(user["ending_time"], "%Y-%m-%d %H:%M:%S")
+        target_time = datetime.strptime(whoop["ending_time"], "%Y-%m-%d %H:%M:%S")
 
         if current_time >= target_time:
             print("comparing...")
 
-            user_list.remove(user)
-            print("Deleteted: ", user)
+            whoop_list.remove(whoop)
+            print("Deleteted: ", whoop)
 
-            user_dict = {"whoops": user_list}
-            emitting_json = json.dumps(user_dict)
+            whoop_dict = {"whoops": whoop_list}
+            emitting_json = json.dumps(whoop_dict)
 
             socketio_emit("user_event", emitting_json)
 

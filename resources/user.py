@@ -14,7 +14,7 @@ from models.revoken_token import RevokedTokenModel
 from schemas.user import UserSchema
 
 user_schema = UserSchema()
-user_list_schema = UserSchema(many=True)
+users_schema = UserSchema(many=True)
 
 class UserSignup(Resource):
     @classmethod
@@ -63,6 +63,7 @@ class UserSignin(Resource):
 
 class User(Resource):
     @classmethod
+    @jwt_required()
     def get(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
@@ -71,6 +72,7 @@ class User(Resource):
         return user_schema.dump(user), 200
 
     @classmethod
+    @jwt_required()
     def delete(cls, user_id):
         user = UserModel.find_by_id(user_id)
         if not user:
@@ -82,9 +84,10 @@ class User(Resource):
 
 class AllUsers(Resource):
     @classmethod
+    @jwt_required()
     def get(cls):
         #return UserModel.return_all()
-        return {'users': user_list_schema.dump(UserModel.find_all())}, 200
+        return {'users': users_schema.dump(UserModel.find_all())}, 200
 
 
 class UserLogout(Resource):

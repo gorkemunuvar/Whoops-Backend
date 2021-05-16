@@ -2,7 +2,7 @@ import json
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 
-from g_variables import user_list
+from g_variables import whoop_list
 
 
 def socketio_emit(name: str, message: str) -> None:
@@ -17,7 +17,7 @@ class Test(Resource):
     @jwt_required()
     def get(self):
 
-        user_dict = {"whoops": user_list}
+        user_dict = {"whoops": whoop_list}
         emitting_json = json.dumps(user_dict)
 
         print("----------------test api----------------")

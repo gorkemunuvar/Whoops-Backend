@@ -88,10 +88,10 @@ def token_not_fresh_callback():
 
 @socketio.on("connect")
 def connect():
-    from g_variables import user_list
+    from g_variables import whoop_list
 
     print("A user connected.")
-    user_dict = {"whoops": user_list}
+    user_dict = {"whoops": whoop_list}
     emitting_json = json.dumps(user_dict)
     socketio.emit("user_event", emitting_json)
 
