@@ -14,18 +14,19 @@ from models.revoken_token import RevokedTokenModel
 from schemas.user import UserSchema
 
 user_schema = UserSchema()
-users_schema = UserSchema(many=True)
+users_schema = UserSchema(many=True, )
+
 
 class UserSignup(Resource):
     @classmethod
     def post(cls):
         user_json = request.get_json()
         user = user_schema.load(user_json)
-        
+
         if UserModel.find_by_email(user.email):
             return {"message": "A user with that email already exists."}, 400
 
-        user.password = UserModel.generate_hash(user.password) 
+        user.password = UserModel.generate_hash(user.password)
         user.save_to_db()
 
         return {'messsage': 'Created successfully.'}, 201
@@ -61,6 +62,7 @@ class UserSignin(Resource):
         else:
             return {"message": "Wrong credentials"}, 401
 
+
 class User(Resource):
     @classmethod
     @jwt_required()
@@ -68,7 +70,7 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User not found!'}, 404
-        
+
         return user_schema.dump(user), 200
 
     @classmethod
@@ -77,16 +79,17 @@ class User(Resource):
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User not found!'}, 404
-        
+
         user.delete()
-        
+
         return {'message': 'User deleted.'}, 200
+
 
 class AllUsers(Resource):
     @classmethod
     @jwt_required()
     def get(cls):
-        #return UserModel.return_all()
+        # return UserModel.return_all()
         return {'users': users_schema.dump(UserModel.find_all())}, 200
 
 

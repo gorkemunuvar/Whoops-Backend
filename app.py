@@ -37,6 +37,7 @@ api = Api(app)
 def create_tables():
     db.create_all()
 
+
 @app.errorhandler(ValidationError)
 def handle_marshmallow_validation_error(err):
     return jsonify(err.messages), 400

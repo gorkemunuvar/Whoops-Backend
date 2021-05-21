@@ -1,6 +1,5 @@
 from db import db
 
-
 class WhoopModel(db.Model):
     __tablename__ = "whoop"
 
@@ -11,6 +10,7 @@ class WhoopModel(db.Model):
     time = db.Column(db.Integer)
     starting_time = db.Column(db.Text)
     ending_time = db.Column(db.Text)
+
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
