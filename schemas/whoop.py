@@ -7,7 +7,7 @@ class WhoopSchema(ma.SQLAlchemyAutoSchema):
         model = WhoopModel
         ordered = True
         # model to dict
-        dump_only = ('starting_time', 'ending_time',)
+        dump_only = ('starting_time', 'ending_time', 'user_id')
         # marshmallow-sqlalchemy will return UserModel obj instead of dict.
         load_instance = True
         include_fk = True

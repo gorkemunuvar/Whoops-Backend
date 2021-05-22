@@ -1,5 +1,6 @@
 import json
 import datetime
+from os import O_RDONLY
 from flask import request
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
@@ -14,7 +15,7 @@ from models.revoken_token import RevokedTokenModel
 from schemas.user import UserSchema
 
 user_schema = UserSchema()
-users_schema = UserSchema(many=True, )
+users_schema = UserSchema(many=True, exclude=('whoops',))
 
 
 class UserSignup(Resource):
@@ -66,12 +67,17 @@ class UserSignin(Resource):
 class User(Resource):
     @classmethod
     @jwt_required()
-    def get(cls, user_id):
-        user = UserModel.find_by_id(user_id)
+    def get(cls):
+        user_jwt_id = get_jwt_identity()
+        user = UserModel.find_by_id(user_jwt_id)
+        
         if not user:
             return {'message': 'User not found!'}, 404
 
-        return user_schema.dump(user), 200
+        user_json = user_schema.dump(user)
+        user_json['whoops_count'] = len(user.whoops)
+
+        return user_json, 200
 
     @classmethod
     @jwt_required()

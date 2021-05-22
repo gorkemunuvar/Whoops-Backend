@@ -110,7 +110,7 @@ def set_api():
     )
 
     # user resources
-    api.add_resource(User, "/user/<int:user_id>")
+    api.add_resource(User, "/user")
     api.add_resource(UserSignin, "/signin")
     api.add_resource(UserSignup, "/signup")
     api.add_resource(UserLogout, "/logout")
