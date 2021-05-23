@@ -1,14 +1,15 @@
 import json
 from db import db
 from datetime import datetime
+
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
-
 from flask_restful import Api
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
+from flask_uploads import patch_request_class, configure_uploads
 
 from dotenv import load_dotenv
 
@@ -16,17 +17,21 @@ from ma import ma
 from marshmallow import ValidationError
 
 from helpers.task import scheduleTask
+from helpers.image_helper import IMAGE_SET
 from models.revoken_token import RevokedTokenModel
 
 app = Flask(__name__)
 
 load_dotenv(".env", verbose=True)
-app.config.from_object("default_config")  # load default configs from default_config.py
+# load default configs from default_config.py
+app.config.from_object("default_config")
 app.config.from_envvar(
     "APPLICATION_SETTINGS"
 )  # override with config.py (APPLICATION_SETTINGS points to config.py)
 
-
+# 10 MB max image size upload
+patch_request_class(app, 10 * 1024 * 1024)
+configure_uploads(app, IMAGE_SET)
 
 socketio = SocketIO(app, logger=True)
 jwt = JWTManager(app)
@@ -101,6 +106,7 @@ def set_api():
     from resources.test import Test
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
+    from resources.image import ImageUpload, Image
     from resources.user import (
         User,
         UserSignin,
@@ -125,6 +131,10 @@ def set_api():
     # token resources
     api.add_resource(TokenRefresh, "/token/refresh")
     api.add_resource(TokenBlacklist, "/token/is_token_blacklisted")
+
+    # image resources
+    api.add_resource(ImageUpload, '/upload/image')
+    api.add_resource(Image, '/image/<string:filename>')
 
 
 if __name__ == "__main__":
