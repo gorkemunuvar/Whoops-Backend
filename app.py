@@ -10,6 +10,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
 
+from dotenv import load_dotenv
+
 from ma import ma
 from marshmallow import ValidationError
 
@@ -18,14 +20,12 @@ from models.revoken_token import RevokedTokenModel
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "appsecretkey"
-app.config['PROPAGATE_EXCEPTIONS'] = True
+load_dotenv(".env", verbose=True)
+app.config.from_object("default_config")  # load default configs from default_config.py
+app.config.from_envvar(
+    "APPLICATION_SETTINGS"
+)  # override with config.py (APPLICATION_SETTINGS points to config.py)
 
-app.config["JWT_SECRET_KEY"] = "jwtsecretkey"
-app.config["JWT_BLACKLIST_ENABLED"] = True
-app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access", "refresh"]
 
 
 socketio = SocketIO(app, logger=True)

@@ -13,10 +13,11 @@ flask-restful = "*"
 passlib = "*"
 flask-migrate = "*"
 gevent-websocket = "*"
-black = "*"
 marshmallow = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+flask-uploads = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
