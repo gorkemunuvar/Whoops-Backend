@@ -1,5 +1,4 @@
 import json
-from db import db
 from datetime import datetime
 
 from flask import Flask, jsonify
@@ -12,17 +11,20 @@ from flask_jwt_extended import JWTManager
 from flask_uploads import patch_request_class, configure_uploads
 
 from dotenv import load_dotenv
-
-from ma import ma
 from marshmallow import ValidationError
 
 from helpers.task import scheduleTask
 from helpers.image_helper import IMAGE_SET
 from models.revoken_token import RevokedTokenModel
 
+load_dotenv(".env", verbose=True)
+
+from ma import ma
+from db import db
+from oa import oauth
+
 app = Flask(__name__)
 
-load_dotenv(".env", verbose=True)
 # load default configs from default_config.py
 app.config.from_object("default_config")
 app.config.from_envvar(
@@ -107,6 +109,7 @@ def set_api():
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
     from resources.image import ImageUpload, Image, AvatarUpload, Avatar
+    from resources.github_login import GithubLogin
     from resources.user import (
         User,
         UserSignin,
@@ -138,15 +141,20 @@ def set_api():
     api.add_resource(AvatarUpload, '/upload/avatar')
     api.add_resource(Avatar, '/avatar/<int:user_id>')
 
+    # github auth resources
+    api.add_resource(GithubLogin, '/login/github')
 
 if __name__ == "__main__":
     db.init_app(app)
     ma.init_app(app)
-    set_api()
-    scheduler = APScheduler()
+    oauth.init_app(app)
 
+    set_api()
+
+    scheduler = APScheduler()
     scheduler.add_job(
         id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
     )
     scheduler.start()
+    
     socketio.run(app, debug=True, use_reloader=False)
