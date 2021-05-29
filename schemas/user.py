@@ -2,7 +2,6 @@ from ma import ma
 from models.user import UserModel
 from schemas.whoop import WhoopSchema
 
-
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = UserModel

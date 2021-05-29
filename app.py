@@ -106,7 +106,7 @@ def set_api():
     from resources.test import Test
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
-    from resources.image import ImageUpload, Image
+    from resources.image import ImageUpload, Image, AvatarUpload, Avatar
     from resources.user import (
         User,
         UserSignin,
@@ -135,6 +135,8 @@ def set_api():
     # image resources
     api.add_resource(ImageUpload, '/upload/image')
     api.add_resource(Image, '/image/<string:filename>')
+    api.add_resource(AvatarUpload, '/upload/avatar')
+    api.add_resource(Avatar, '/avatar/<int:user_id>')
 
 
 if __name__ == "__main__":
