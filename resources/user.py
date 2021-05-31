@@ -47,13 +47,15 @@ class UserSignin(Resource):
         # Expire süresi False olmazsa client tarafında token expire olduğunda örneğin ShareWhoop
         # endpointine istek atıldığında auth. problemi oluyor. Böyle durumlarda tekrarda refresh
         # token yapılmalı.
+
+        # add 'and user.password'
         if UserModel.verify_hash(user_data.password, current_user.password):
             access_token = create_access_token(
                 identity=current_user.id,
                 expires_delta=False,
                 fresh=True
             )
-            refresh_token = create_refresh_token(identity=current_user.email)
+            refresh_token = create_refresh_token(identity=current_user.id)
 
             return {
                 "message": "Logged in as {}".format(current_user.email),
@@ -70,7 +72,7 @@ class User(Resource):
     def get(cls):
         user_jwt_id = get_jwt_identity()
         user = UserModel.find_by_id(user_jwt_id)
-        
+
         if not user:
             return {'message': 'User not found!'}, 404
 
@@ -111,3 +113,20 @@ class UserLogout(Resource):
             return {"message": "User logged out and access token has been revoked."}, 200
         except:
             return {"message": "Something went wrong"}, 500
+
+
+class SetPassword(Resource):
+    @classmethod
+    @jwt_required(fresh=True)
+    def post(cls):
+        # user_json = email and new password
+        user_json = request.get_json()
+        user_data = user_schema.load(user_json)
+
+        user = UserModel.find_by_email(user_data.email)
+
+        if not user:
+            return {'message': 'User not found!'}, 404
+
+        user.password = user_data.password
+        user.save_to_db()

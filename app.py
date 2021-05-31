@@ -1,3 +1,6 @@
+from oa import oauth
+from db import db
+from ma import ma
 import json
 from datetime import datetime
 
@@ -19,9 +22,6 @@ from models.revoken_token import RevokedTokenModel
 
 load_dotenv(".env", verbose=True)
 
-from ma import ma
-from db import db
-from oa import oauth
 
 app = Flask(__name__)
 
@@ -109,31 +109,33 @@ def set_api():
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
     from resources.image import ImageUpload, Image, AvatarUpload, Avatar
-    from resources.github_login import GithubLogin
+    from resources.google_login import GoogleLogin, GoogleAuthorize
     from resources.user import (
         User,
         UserSignin,
         UserSignup,
         UserLogout,
         AllUsers,
+        SetPassword
     )
 
     # user resources
-    api.add_resource(User, "/user")
-    api.add_resource(UserSignin, "/signin")
-    api.add_resource(UserSignup, "/signup")
-    api.add_resource(UserLogout, "/logout")
-    api.add_resource(AllUsers, "/users")
+    api.add_resource(User, '/user')
+    api.add_resource(UserSignin, '/signin')
+    api.add_resource(UserSignup, '/signup')
+    api.add_resource(UserLogout, '/logout')
+    api.add_resource(AllUsers, '/users')
+    api.add_resource(SetPassword, '/user/set_password')
 
     # test resources
-    api.add_resource(Test, "/test")
+    api.add_resource(Test, '/test')
 
     # whoop resources
-    api.add_resource(ShareWhoop, "/whoop/share")
+    api.add_resource(ShareWhoop, '/whoop/share')
 
     # token resources
-    api.add_resource(TokenRefresh, "/token/refresh")
-    api.add_resource(TokenBlacklist, "/token/is_token_blacklisted")
+    api.add_resource(TokenRefresh, '/token/refresh')
+    api.add_resource(TokenBlacklist, '/token/is_token_blacklisted')
 
     # image resources
     api.add_resource(ImageUpload, '/upload/image')
@@ -141,8 +143,11 @@ def set_api():
     api.add_resource(AvatarUpload, '/upload/avatar')
     api.add_resource(Avatar, '/avatar/<int:user_id>')
 
-    # github auth resources
-    api.add_resource(GithubLogin, '/login/github')
+    # google oauth resources
+    api.add_resource(GoogleLogin, '/login/google')
+    api.add_resource(GoogleAuthorize, '/login/google/authorized',
+                     endpoint='google.authorized')
+
 
 if __name__ == "__main__":
     db.init_app(app)
@@ -156,5 +161,5 @@ if __name__ == "__main__":
         id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
     )
     scheduler.start()
-    
+
     socketio.run(app, debug=True, use_reloader=False)

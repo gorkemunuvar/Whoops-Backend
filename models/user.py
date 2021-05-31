@@ -9,7 +9,9 @@ class UserModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), nullable=False, unique=True)
-    password = db.Column(db.String(120), nullable=False)
+    # When a user auth. with social app we don't pass a password.
+    # It can not be nullable=False
+    password = db.Column(db.String(120))
     whoops = db.relationship(
         "WhoopModel", backref="user", cascade="all, delete, delete-orphan", lazy=True,
     )
