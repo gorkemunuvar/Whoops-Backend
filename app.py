@@ -110,6 +110,7 @@ def set_api():
     from resources.token import TokenRefresh, TokenBlacklist
     from resources.image import ImageUpload, Image, AvatarUpload, Avatar
     from resources.google_login import GoogleLogin, GoogleAuthorize
+    from resources.facebook_login import FacebookLogin, FacebookAuthorize
     from resources.user import (
         User,
         UserSignin,
@@ -147,6 +148,11 @@ def set_api():
     api.add_resource(GoogleLogin, '/login/google')
     api.add_resource(GoogleAuthorize, '/login/google/authorized',
                      endpoint='google.authorized')
+
+    # facebook oauth resources
+    api.add_resource(FacebookLogin, '/login/facebook')
+    api.add_resource(FacebookAuthorize, '/login/facebook/authorized',
+                     endpoint='facebook.authorized')
 
 
 if __name__ == "__main__":
