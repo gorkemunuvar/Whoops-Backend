@@ -19,6 +19,7 @@ flask-uploads = "*"
 python-dotenv = "*"
 flask-oauthlib = "*"
 gevent-websocket = "*"
+flask-dance = "*"
 
 [dev-packages]
 autopep8 = "*"

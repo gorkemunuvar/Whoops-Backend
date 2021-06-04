@@ -8,6 +8,8 @@ GOOGLE_APP_SECRET = 'o0oscaAYrGPPbASVNLcHrSqc'
 FACEBOOK_APP_ID = '523200682045074'
 FACEBOOK_APP_SECRET = 'b21043ce06dcae9df8ff9e4294d60381'
 
+TWITTER_APP_ID = '6D2OVkNHpJmHFf3OnCPGL6sv3'
+TWITTER_APP_SECRET = 'BIQ7CUSu9JDo0xUIs4QwOoGvRCNm1UBo8V4FfrpbSBU0HaNcRl'
 
 # It is the link between the settings and our app
 oauth = OAuth()
@@ -39,6 +41,16 @@ facebook = oauth.remote_app(
     authorize_url='https://www.facebook.com/dialog/oauth'
 )
 
+twitter = oauth.remote_app(
+    'twitter',
+    consumer_key=TWITTER_APP_ID,
+    consumer_secret=TWITTER_APP_SECRET,
+    base_url='https://api.twitter.com/1.1/',
+    request_token_url='https://api.twitter.com/oauth/request_token',
+    access_token_url='https://api.twitter.com/oauth/access_token',
+    authorize_url='https://api.twitter.com/oauth/authorize'
+)
+
 
 @google.tokengetter
 def get_google_oauth_token():
@@ -50,3 +62,19 @@ def get_google_oauth_token():
 def get_facebook_oauth_token():
     if 'access_token' in g:
         return g.access_token
+
+
+@twitter.tokengetter
+def get_twitter_oauth_token():
+    if 'access_token' in g:
+        return g.access_token
+
+
+
+
+""" 
+
+    if 'twitter_oauth' in session:
+        resp = session['twitter_oauth']
+        return resp['oauth_token'], resp['oauth_token_secret']
+ """

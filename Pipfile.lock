@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "be45c83f98480304bc21b9d32c3527224c99b8accc155e7b53b3a0f8df244c05"
+            "sha256": "1cb6dceeb3ce37f4ec35285b282bf1eabfa95e8412e43e9b18091d00a4ceef69"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -146,6 +146,15 @@
             ],
             "index": "pypi",
             "version": "==1.12.2"
+        },
+        "flask-dance": {
+            "hashes": [
+                "sha256:4495e5045492dd5bb42d0d26bbef833c861ba28b6d16ebf0bdbb091459dc5e0c",
+                "sha256:d3b1d3597512dc0aeae3a0c39c15fe5643fca84b12eef10be6e9894bc13fdef0",
+                "sha256:f0a4a6e9ded71116a91486c333151edf29f5a3946660c6406eb113eafb4207b8"
+            ],
+            "index": "pypi",
+            "version": "==5.0.0"
         },
         "flask-jwt-extended": {
             "hashes": [
@@ -547,6 +556,12 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'",
             "version": "==1.26.5"
+        },
+        "urlobject": {
+            "hashes": [
+                "sha256:47b2e20e6ab9c8366b2f4a3566b6ff4053025dad311c4bb71279bbcfa2430caa"
+            ],
+            "version": "==2.4.3"
         },
         "werkzeug": {
             "hashes": [
