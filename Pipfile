@@ -17,9 +17,9 @@ flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 python-dotenv = "*"
 flask-oauthlib = "*"
-gevent-websocket = "*"
 flask-dance = "*"
 gunicorn = "*"
+eventlet = "*"
 
 [dev-packages]
 autopep8 = "*"
