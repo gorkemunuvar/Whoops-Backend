@@ -178,7 +178,7 @@ scheduler.add_job(
 )
 scheduler.start()
 
-socketio.run(app, debug=True, use_reloader=False)
+socketio.run(app, use_reloader=False)
 
 
 
