@@ -164,8 +164,12 @@ def set_api():
                      endpoint='twitter.authorized')
 
 
+# I moved this line outside of the main func. because when I run
+# the app on Heroku with gunicorn it only works like that.
+db.init_app(app)
+
+
 if __name__ == "__main__":
-    db.init_app(app)
     ma.init_app(app)
     oauth.init_app(app)
 
