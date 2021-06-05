@@ -172,16 +172,17 @@ oauth.init_app(app)
 
 set_api()
 
-scheduler = APScheduler()
-scheduler.add_job(
-    id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
-)
-scheduler.start()
 
-socketio.run(app, debug=True, use_reloader=False)
 
 
 if __name__ == "__main__":
+    scheduler = APScheduler()
+    scheduler.add_job(
+        id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
+    )
+    scheduler.start()
+
+    socketio.run(app, debug=True, use_reloader=False)
     pass
     # db.init_app(app)
     # ma.init_app(app)
