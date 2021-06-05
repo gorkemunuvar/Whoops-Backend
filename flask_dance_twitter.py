@@ -25,6 +25,8 @@ def twitter_login():
     account_info = twitter.get('account/settings.json')
     account_info_json = account_info.json()
 
+    print(account_info_json)
+
     return '<h1>Your Twitter name is @{}'.format(account_info_json['screen_name'])
 
 

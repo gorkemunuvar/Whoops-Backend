@@ -111,6 +111,7 @@ def set_api():
     from resources.image import ImageUpload, Image, AvatarUpload, Avatar
     from resources.google_login import GoogleLogin, GoogleAuthorize
     from resources.facebook_login import FacebookLogin, FacebookAuthorize
+    from resources.twitter_login import TwitterLogin, TwitterAuthorize
     from resources.user import (
         User,
         UserSignin,
@@ -153,6 +154,11 @@ def set_api():
     api.add_resource(FacebookLogin, '/login/facebook')
     api.add_resource(FacebookAuthorize, '/login/facebook/authorized',
                      endpoint='facebook.authorized')
+
+    # twitter oauth resources
+    api.add_resource(TwitterLogin, '/login/twitter')
+    api.add_resource(TwitterAuthorize, '/login/twitter/authorized',
+                     endpoint='twitter.authorized')
 
 
 if __name__ == "__main__":

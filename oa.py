@@ -8,8 +8,8 @@ GOOGLE_APP_SECRET = 'o0oscaAYrGPPbASVNLcHrSqc'
 FACEBOOK_APP_ID = '523200682045074'
 FACEBOOK_APP_SECRET = 'b21043ce06dcae9df8ff9e4294d60381'
 
-TWITTER_APP_ID = '6D2OVkNHpJmHFf3OnCPGL6sv3'
-TWITTER_APP_SECRET = 'BIQ7CUSu9JDo0xUIs4QwOoGvRCNm1UBo8V4FfrpbSBU0HaNcRl'
+TWITTER_APP_ID = 'z1ZE4AUQe2NRIquxQndZvg81E'
+TWITTER_APP_SECRET = 'aKXfHdCZkjIM8dVCt3n2Ptw2KgkwZicmrtVRWAOLk9oKws5V22'
 
 # It is the link between the settings and our app
 oauth = OAuth()
@@ -68,8 +68,6 @@ def get_facebook_oauth_token():
 def get_twitter_oauth_token():
     if 'access_token' in g:
         return g.access_token
-
-
 
 
 """ 
