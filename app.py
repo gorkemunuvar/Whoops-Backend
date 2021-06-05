@@ -164,21 +164,35 @@ def set_api():
                      endpoint='twitter.authorized')
 
 
-# I moved this line outside of the main func. because when I run
+# I moved all the script outside of the main func. because when I run
 # the app on Heroku with gunicorn it only works like that.
 db.init_app(app)
+ma.init_app(app)
+oauth.init_app(app)
+
+set_api()
+
+scheduler = APScheduler()
+scheduler.add_job(
+    id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
+)
+scheduler.start()
+
+socketio.run(app, debug=True, use_reloader=False)
 
 
 if __name__ == "__main__":
-    ma.init_app(app)
-    oauth.init_app(app)
+    pass
+    # db.init_app(app)
+    # ma.init_app(app)
+    # oauth.init_app(app)
 
-    set_api()
+    # set_api()
 
-    scheduler = APScheduler()
-    scheduler.add_job(
-        id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
-    )
-    scheduler.start()
+    # scheduler = APScheduler()
+    # scheduler.add_job(
+    #     id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
+    # )
+    # scheduler.start()
 
-    socketio.run(app, debug=True, use_reloader=False)
+    # socketio.run(app, debug=True, use_reloader=False)
