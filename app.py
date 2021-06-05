@@ -106,6 +106,7 @@ def connect():
 
 def set_api():
     from resources.test import Test
+    from resources.home import HomePage
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
     from resources.image import ImageUpload, Image, AvatarUpload, Avatar
@@ -120,6 +121,9 @@ def set_api():
         AllUsers,
         SetPassword
     )
+
+    # home page resources
+    api.add_resource(HomePage, '/')
 
     # user resources
     api.add_resource(User, '/user')
