@@ -7,17 +7,16 @@ from datetime import datetime
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_restful import Api
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
-from flask_uploads import patch_request_class, configure_uploads
+#from flask_uploads import patch_request_class, configure_uploads
 
 from dotenv import load_dotenv
 from marshmallow import ValidationError
 
 from helpers.task import scheduleTask
-from helpers.image_helper import IMAGE_SET
+#from helpers.image_helper import IMAGE_SET
 from models.revoken_token import RevokedTokenModel
 
 load_dotenv(".env", verbose=True)
@@ -32,8 +31,8 @@ app.config.from_envvar(
 )  # override with config.py (APPLICATION_SETTINGS points to config.py)
 
 # 10 MB max image size upload
-patch_request_class(app, 10 * 1024 * 1024)
-configure_uploads(app, IMAGE_SET)
+#patch_request_class(app, 10 * 1024 * 1024)
+#configure_uploads(app, IMAGE_SET)
 
 socketio = SocketIO(app, logger=True)
 jwt = JWTManager(app)
@@ -109,7 +108,7 @@ def set_api():
     from resources.home import HomePage
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
-    from resources.image import ImageUpload, Image, AvatarUpload, Avatar
+    # from resources.image import ImageUpload, Image, AvatarUpload, Avatar
     from resources.google_login import GoogleLogin, GoogleAuthorize
     from resources.facebook_login import FacebookLogin, FacebookAuthorize
     from resources.twitter_login import TwitterLogin, TwitterAuthorize
@@ -144,10 +143,10 @@ def set_api():
     api.add_resource(TokenBlacklist, '/token/is_token_blacklisted')
 
     # image resources
-    api.add_resource(ImageUpload, '/upload/image')
-    api.add_resource(Image, '/image/<string:filename>')
-    api.add_resource(AvatarUpload, '/upload/avatar')
-    api.add_resource(Avatar, '/avatar/<int:user_id>')
+    #api.add_resource(ImageUpload, '/upload/image')
+    #api.add_resource(Image, '/image/<string:filename>')
+    #api.add_resource(AvatarUpload, '/upload/avatar')
+    #api.add_resource(Avatar, '/avatar/<int:user_id>')
 
     # google oauth resources
     api.add_resource(GoogleLogin, '/login/google')
