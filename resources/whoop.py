@@ -12,7 +12,7 @@ whoop_schema = WhoopSchema()
 
 def socketio_emit(name, message):
     # from app does not work
-    from __main__ import socketio
+    from app import socketio
 
     socketio.emit(name, message)
 
