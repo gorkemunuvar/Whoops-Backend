@@ -19,7 +19,7 @@ python-dotenv = "*"
 flask-oauthlib = "*"
 flask-dance = "*"
 gunicorn = "*"
-eventlet = "*"
+eventlet = "==0.30.2"
 
 [dev-packages]
 autopep8 = "*"

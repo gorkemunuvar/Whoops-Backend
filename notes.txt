@@ -5,3 +5,7 @@
 - Backend'de db yi silip sıfırdan oluştursam bile mobil tarafta kayıtlı token var ise jwt geçerli olduğu için
   uygulama hala login olaliyor. DB'nin gerçekte silinmesi söz konusu olmasa da belki problem olabilir. Örneğin
   mobil tarafta jwt'ye ait kullanıcı db'de var mı yok mu kontrol edilebilir. 
+
+
+ # to create requirements.txt file
+  pipenv lock -r > requirements.txt
