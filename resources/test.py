@@ -7,7 +7,7 @@ from g_variables import whoop_list
 
 def socketio_emit(name: str, message: str) -> None:
     # 'from app' does not work
-    from __main__ import socketio
+    from app import socketio
 
     socketio.emit(name, message)
 
