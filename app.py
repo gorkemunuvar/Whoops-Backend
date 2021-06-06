@@ -186,7 +186,7 @@ socketio.run(app, use_reloader=False) """
 
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app, use_reloader=False) 
     pass
     # db.init_app(app)
     # ma.init_app(app)
