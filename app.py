@@ -161,7 +161,7 @@ def set_api():
     api.add_resource(FacebookAuthorize, '/login/facebook/authorized',
                      endpoint='facebook.authorized')
 
-    # twitter oauth resources   
+    # twitter oauth resources
     api.add_resource(TwitterLogin, '/login/twitter')
     api.add_resource(TwitterAuthorize, '/login/twitter/authorized',
                      endpoint='twitter.authorized')
@@ -175,15 +175,13 @@ oauth.init_app(app)
 set_api()
 
 
-""" scheduler = APScheduler()
+scheduler = APScheduler()
 scheduler.add_job(
     id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
 )
 scheduler.start()
 
-socketio.run(app, use_reloader=False) """
-
-
+#socketio.run(app, use_reloader=False)
 
 if __name__ == "__main__":
     # db.init_app(app)
