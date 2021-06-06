@@ -19,7 +19,7 @@ python-dotenv = "*"
 flask-oauthlib = "*"
 flask-dance = "*"
 gunicorn = "*"
-gevent-websocket = "*"
+eventlet = "*"
 
 [dev-packages]
 autopep8 = "*"
