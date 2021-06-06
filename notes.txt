@@ -7,5 +7,5 @@
   mobil tarafta jwt'ye ait kullanıcı db'de var mı yok mu kontrol edilebilir. 
 
 
- # to create requirements.txt file
-  pipenv lock -r > requirements.txt
+# to create requirements.txt file
+pipenv lock -r > requirements.txt
