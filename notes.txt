@@ -9,3 +9,6 @@
 
 # to create requirements.txt file
 pipenv lock -r > requirements.txt
+
+# to push changes to heroku branch
+git push origin main:heroku

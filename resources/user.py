@@ -1,3 +1,4 @@
+
 import json
 import datetime
 from os import O_RDONLY
@@ -13,6 +14,8 @@ from flask_jwt_extended import (
 from models.user import UserModel
 from models.revoken_token import RevokedTokenModel
 from schemas.user import UserSchema
+
+from models.mongodb_models import User, Whoop
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True, exclude=('whoops',))

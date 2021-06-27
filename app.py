@@ -1,9 +1,9 @@
 import eventlet
 
+import json
 from oa import oauth
 from db import db
 from ma import ma
-import json
 from datetime import datetime
 
 
@@ -20,7 +20,8 @@ from marshmallow import ValidationError
 
 from helpers.task import scheduleTask
 #from helpers.image_helper import IMAGE_SET
-from models.revoken_token import RevokedTokenModel
+#from models.revoken_token import RevokedTokenModel
+from models.mongodb_models import RevokedTokenModel
 
 load_dotenv(".env", verbose=True)
 
@@ -29,6 +30,9 @@ app = Flask(__name__)
 
 # load default configs from default_config.py
 app.config.from_object("default_config")
+
+app.config["MONGODB_DB"] = 'whoops-database'
+
 app.config.from_envvar(
     "APPLICATION_SETTINGS"
 )  # override with config.py (APPLICATION_SETTINGS points to config.py)
@@ -115,31 +119,43 @@ def set_api():
     from resources.google_login import GoogleLogin, GoogleAuthorize
     from resources.facebook_login import FacebookLogin, FacebookAuthorize
     from resources.twitter_login import TwitterLogin, TwitterAuthorize
-    from resources.user import (
-        User,
-        UserSignin,
-        UserSignup,
-        UserLogout,
-        AllUsers,
-        SetPassword
+
+    from resources.user_mongo import (
+        MongoUserSignUp, MongoUserSignin, MongoUser, MongoAllUsers, MongoUserLogout, MongoSetPassword
     )
+
+    from resources.whoop_mongo import MongoShareWhoop
+
+    # mongo user resources
+    api.add_resource(MongoUser, '/user')
+    api.add_resource(MongoAllUsers, '/user/all')
+    api.add_resource(MongoUserSignUp, '/user/signup')
+    api.add_resource(MongoUserSignin, '/user/signin')
+    api.add_resource(MongoUserLogout, '/user/logout')
+    api.add_resource(MongoSetPassword, '/user/setpassword')
+
+    # mongo whoop resources
+    api.add_resource(MongoShareWhoop, '/whoop/share')
+
 
     # home page resources
     api.add_resource(HomePage, '/')
 
     # user resources
-    api.add_resource(User, '/user')
-    api.add_resource(UserSignin, '/signin')
-    api.add_resource(UserSignup, '/signup')
-    api.add_resource(UserLogout, '/logout')
-    api.add_resource(AllUsers, '/users')
-    api.add_resource(SetPassword, '/user/set_password')
+    #api.add_resource(User, '/user')
+    #api.add_resource(UserSignin, '/signin')
+
+    #api.add_resource(UserSignup, '/signup')
+
+    #api.add_resource(UserLogout, '/logout')
+    #api.add_resource(AllUsers, '/users')
+    #api.add_resource(SetPassword, '/user/set_password')
 
     # test resources
     api.add_resource(Test, '/test')
 
     # whoop resources
-    api.add_resource(ShareWhoop, '/whoop/share')
+    #api.add_resource(ShareWhoop, '/whoop/share')
 
     # token resources
     api.add_resource(TokenRefresh, '/token/refresh')

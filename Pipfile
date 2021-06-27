@@ -20,6 +20,8 @@ flask-oauthlib = "*"
 flask-dance = "*"
 gunicorn = "*"
 eventlet = "==0.30.2"
+wheel = "*"
+mongoengine = "*"
 
 [dev-packages]
 autopep8 = "*"
