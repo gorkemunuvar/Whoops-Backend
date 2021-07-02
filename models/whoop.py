@@ -1,19 +1,34 @@
-from db import db
+from models.user import User
+from models.address import Address
+from mongoengine import (DynamicDocument, StringField, EmbeddedDocumentField,
+                         FloatField, IntField, ReferenceField, ListField, CASCADE)
 
-class WhoopModel(db.Model):
-    __tablename__ = "whoop"
+class Whoop(DynamicDocument):
+    title = StringField(required=True)
+    latitude = FloatField(required=True)
+    longitude = FloatField(required=True)
+    time = IntField(required=True)
+    date_created = StringField()
+    starting_time = StringField(required=True)
+    ending_time = StringField(required=True)
+    tags = ListField()
+    address = EmbeddedDocumentField(Address)
 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-    time = db.Column(db.Integer)
-    starting_time = db.Column(db.Text)
-    ending_time = db.Column(db.Text)
+    user = ReferenceField(User, reverse_delete_rule=CASCADE)
 
+    meta = {'allow_inheritance': True}
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    def to_json(self) -> dict:
+        whoop_json = {
+            'title': self.title,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'time': self.time,
+            'date_created': self.date_created,
+            'starting_time': self.starting_time,
+            'ending_time': self.ending_time,
+            'tags': self.tags,
+            'address': self.address.to_json()
+        }
 
-    def save_to_db(self) -> None:
-        db.session.add(self)
-        db.session.commit()
+        return whoop_json

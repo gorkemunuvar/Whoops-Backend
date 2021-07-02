@@ -4,7 +4,7 @@ from datetime import datetime
 
 def socketio_emit(name, message):
     # from app does not work
-    from app import socketio
+    from __main__ import socketio
 
     socketio.emit(name, message)
 

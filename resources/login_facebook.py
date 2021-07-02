@@ -2,9 +2,10 @@ from flask import request, g, url_for
 from flask_restful import Resource
 from flask_oauthlib.client import OAuth, OAuthException
 from flask_jwt_extended import create_access_token, create_refresh_token
+from mongoengine import DoesNotExist
 
 from oa import facebook
-from models.user import UserModel
+from models.user import User
 
 
 class FacebookLogin(Resource):
@@ -43,20 +44,23 @@ class FacebookAuthorize(Resource):
         mail = facebook_user.data['email']
         print(f'User: {mail}')
 
-        user = UserModel.find_by_email(mail)
-
         msg = ''
-        if not user:
-            user = UserModel(email=mail, password=None)
-            user.save_to_db()
-            msg = 'User created successfully and '
+        try:
+            user = User.objects.get(email=mail)
+        except DoesNotExist:
+            user = User(email=mail, password=None)
+            user.save()
+            msg = 'User created successfully via Facebook OAuth.'
+
 
         access_token = create_access_token(
-            identity=user.id,
+            identity=str(user.pk),
             expires_delta=False,
             fresh=True
         )
-        refresh_token = create_refresh_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=str(user.pk))
+
+        print(msg)
 
         return {
             "message": msg + "Logged in as {}".format(user.email),

@@ -3,16 +3,16 @@ from flask import request
 from flask_restful import Resource
 from datetime import datetime, timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+from mongoengine import DoesNotExist
 from g_variables import whoop_list
-from models.user import UserModel
-from schemas.whoop import WhoopSchema
 
-whoop_schema = WhoopSchema()
+from models.user import User
+from models.whoop import Whoop, Address
+
 
 def socketio_emit(name, message):
     # from app does not work
-    from app import socketio
+    from __main__ import socketio
 
     socketio.emit(name, message)
 
@@ -22,9 +22,9 @@ class ShareWhoop(Resource):
     @jwt_required()
     def post(cls):
         whoop_json = request.get_json()
-        whoop = whoop_schema.load(whoop_json)
+        #whoop = whoop_schema.load(whoop_json)
 
-        add_second = int(whoop_json["time"])
+        add_second = whoop_json["time"]
         starting_time = datetime.now()
         # days, seconds, then other fields.
         ending_time = starting_time + timedelta(0, add_second)
@@ -32,23 +32,26 @@ class ShareWhoop(Resource):
         print(whoop_json)
 
         user_jwt_id = get_jwt_identity()
-        user = UserModel.find_by_id(user_jwt_id)
 
-        if user is None:
-            print("(Resource: ShareWhoop) User not found by id. ")
-            print("Try to log out and login again.")
-            return {"message": "User not found by id."}, 404
+        try:
+            # after the query current_user is the mongoengine User model
+            loggedin_user = User.objects.get(pk=user_jwt_id)
+        except DoesNotExist:
+            return {"message": "(Share Whoop Resource) User doesn't exist"}, 404
 
-        whoop.user_id = user.id
+        address = Address(**whoop_json['address'])
+        whoop = Whoop(**whoop_json)
+        
+        whoop.date_created = str(datetime.date(datetime.now()))
         whoop.starting_time = str(starting_time.strftime("%Y-%m-%d %H:%M:%S"))
         whoop.ending_time = str(ending_time.strftime("%Y-%m-%d %H:%M:%S"))
+        
+        whoop.address = address
+        whoop.user = loggedin_user
 
-        whoop.save_to_db()
+        whoop.save()
 
-        print(user)
-
-        whoop_dict = whoop_schema.dump(whoop)
-        whoop_list.append(whoop_dict)
+        whoop_list.append(whoop.to_json())
 
         emitting_json = json.dumps({"whoops": whoop_list})
 
@@ -60,5 +63,23 @@ class ShareWhoop(Resource):
         print("Post request has been successed.")
 
         return {"message": "Post request has been successed."}, 200
-        
 
+
+class Whoops(Resource):
+    @classmethod
+    @jwt_required()
+    def get(cls, user_id: str):
+
+        user = User()
+        try:
+            user = User.objects.get(pk=user_id)
+        except DoesNotExist:
+            return {'message': 'User {user_id} not found!'}, 404
+
+        whoops = Whoop.objects(user=user).all()
+
+        whoops_json = []
+        for whoop in whoops:
+            whoops_json.append(whoop.to_json())
+
+        return whoops_json, 200

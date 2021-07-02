@@ -5,8 +5,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from sqlalchemy import false
 
 from oa import twitter
-from models.user import UserModel
-
+from models.user import User
 
 class TwitterLogin(Resource):
     @classmethod

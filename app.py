@@ -1,11 +1,8 @@
-import eventlet
+#import eventlet
 
 import json
 from oa import oauth
-from db import db
-from ma import ma
 from datetime import datetime
-
 
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
@@ -15,13 +12,14 @@ from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
 #from flask_uploads import patch_request_class, configure_uploads
 
+from mongoengine import connect as handle_connection
+
 from dotenv import load_dotenv
-from marshmallow import ValidationError
 
 from helpers.task import scheduleTask
 #from helpers.image_helper import IMAGE_SET
 #from models.revoken_token import RevokedTokenModel
-from models.mongodb_models import RevokedTokenModel
+from models.revoked_token import RevokedTokenModel
 
 load_dotenv(".env", verbose=True)
 
@@ -45,19 +43,10 @@ socketio = SocketIO(app, logger=True)
 jwt = JWTManager(app)
 api = Api(app)
 
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-
-@app.errorhandler(ValidationError)
-def handle_marshmallow_validation_error(err):
-    return jsonify(err.messages), 400
-
-
 # This methods called every time when clients try to access secured endpoints
 # It will check if a token is blacklisted.
+
+
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
     # jti means identity
@@ -116,46 +105,32 @@ def set_api():
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
     # from resources.image import ImageUpload, Image, AvatarUpload, Avatar
-    from resources.google_login import GoogleLogin, GoogleAuthorize
-    from resources.facebook_login import FacebookLogin, FacebookAuthorize
-    from resources.twitter_login import TwitterLogin, TwitterAuthorize
+    from resources.login_google import GoogleLogin, GoogleAuthorize
+    from resources.login_facebook import FacebookLogin, FacebookAuthorize
 
-    from resources.user_mongo import (
-        MongoUserSignUp, MongoUserSignin, MongoUser, MongoAllUsers, MongoUserLogout, MongoSetPassword
+    from resources.user import (
+        UserSignUp, UserSignin, UserResource, AllUsers, UserLogout, SetPassword
     )
 
-    from resources.whoop_mongo import MongoShareWhoop
+    from resources.whoop import ShareWhoop, Whoops
 
     # mongo user resources
-    api.add_resource(MongoUser, '/user')
-    api.add_resource(MongoAllUsers, '/user/all')
-    api.add_resource(MongoUserSignUp, '/user/signup')
-    api.add_resource(MongoUserSignin, '/user/signin')
-    api.add_resource(MongoUserLogout, '/user/logout')
-    api.add_resource(MongoSetPassword, '/user/setpassword')
+    api.add_resource(UserResource, '/user')
+    api.add_resource(AllUsers, '/user/all')
+    api.add_resource(UserSignUp, '/user/signup')
+    api.add_resource(UserSignin, '/user/signin')
+    api.add_resource(UserLogout, '/user/logout')
+    api.add_resource(SetPassword, '/user/setpassword')
 
     # mongo whoop resources
-    api.add_resource(MongoShareWhoop, '/whoop/share')
-
+    api.add_resource(ShareWhoop, '/whoop/share')
+    api.add_resource(Whoops, '/whoops/<string:user_id>')
 
     # home page resources
     api.add_resource(HomePage, '/')
 
-    # user resources
-    #api.add_resource(User, '/user')
-    #api.add_resource(UserSignin, '/signin')
-
-    #api.add_resource(UserSignup, '/signup')
-
-    #api.add_resource(UserLogout, '/logout')
-    #api.add_resource(AllUsers, '/users')
-    #api.add_resource(SetPassword, '/user/set_password')
-
     # test resources
     api.add_resource(Test, '/test')
-
-    # whoop resources
-    #api.add_resource(ShareWhoop, '/whoop/share')
 
     # token resources
     api.add_resource(TokenRefresh, '/token/refresh')
@@ -177,39 +152,37 @@ def set_api():
     api.add_resource(FacebookAuthorize, '/login/facebook/authorized',
                      endpoint='facebook.authorized')
 
-    # twitter oauth resources
-    api.add_resource(TwitterLogin, '/login/twitter')
-    api.add_resource(TwitterAuthorize, '/login/twitter/authorized',
-                     endpoint='twitter.authorized')
-
 
 # I moved all the script outside of the main func. because when I run
 # the app on Heroku with gunicorn it only works like that.
-db.init_app(app)
-ma.init_app(app)
-oauth.init_app(app)
-set_api()
 
+# handle_connection(
+#     host='mongodb+srv://whoops-database:whoops-database@whoops-cluster.sslk6.mongodb.net/whoops-database?retryWrites=true&w=majority',
+# )
 
-scheduler = APScheduler()
-scheduler.add_job(
-    id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
-)
-scheduler.start()
+# oauth.init_app(app)
+# set_api()
 
-#socketio.run(app, use_reloader=False)
+# scheduler = APScheduler()
+# scheduler.add_job(
+#     id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
+# )
+
+# scheduler.start()
 
 if __name__ == "__main__":
-    # db.init_app(app)
-    # ma.init_app(app)
-    # oauth.init_app(app)
+    handle_connection(
+        host='mongodb+srv://whoops-database:whoops-database@whoops-cluster.sslk6.mongodb.net/whoops-database?retryWrites=true&w=majority',
+    )
 
-    # set_api()
+    oauth.init_app(app)
+    set_api()
 
-    # scheduler = APScheduler()
-    # scheduler.add_job(
-    #     id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
-    # )
-    # scheduler.start()
+    scheduler = APScheduler()
+    scheduler.add_job(
+        id="Scheduled Task", func=scheduleTask, trigger="interval", seconds=1
+    )
+
+    scheduler.start()
 
     socketio.run(app, debug=True, use_reloader=False)
