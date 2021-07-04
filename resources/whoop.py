@@ -73,12 +73,52 @@ class Whoops(Resource):
     @jwt_required()
     def get(cls, user_id: str):
         user = User()
+
         try:
             user = User.objects.get(pk=user_id)
         except DoesNotExist:
             return {'message': 'User {user_id} not found!'}, 404
 
         whoops = Whoop.objects(user=user).all()
+        whoops_json = [whoop.to_json() for whoop in whoops]
+
+        return whoops_json, 200
+
+
+class WhoopsByTitle(Resource):
+    @classmethod
+    @jwt_required()
+    def get(cls, title: str):
+        whoops = Whoop.objects(title__icontains=title, is_active=True)
+        whoops_json = [whoop.to_json() for whoop in whoops]
+
+        return whoops_json, 200
+
+
+# Bu api tag substringi içeren whoopları döndürmüyor. gelen tag'i aynen içermesi gerekiyor.
+# Bu düzeltilse iyi olur.
+class WhoopsByTag(Resource):
+    @classmethod
+    @jwt_required()
+    def get(cls, tag: str):
+        whoops = Whoop.objects(tags__icontains=tag, is_active=True)
+        whoops_json = [whoop.to_json() for whoop in whoops]
+
+        return whoops_json, 200
+
+
+class WhoopsByUsername(Resource):
+    @classmethod
+    @jwt_required()
+    def get(cls, username: str):
+        user = User()
+
+        try:
+            user = User.objects.get(username__icontains=username)
+        except DoesNotExist:
+            return {"message": "User does not exist."}, 404
+
+        whoops = Whoop.objects(user=user, is_active=True)
         whoops_json = [whoop.to_json() for whoop in whoops]
 
         return whoops_json, 200

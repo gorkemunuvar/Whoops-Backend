@@ -112,7 +112,7 @@ def set_api():
         UserSignUp, UserSignin, UserResource, AllUsers, UserLogout, SetPassword
     )
 
-    from resources.whoop import ShareWhoop, Whoops
+    from resources.whoop import ShareWhoop, Whoops, WhoopsByTitle, WhoopsByTag, WhoopsByUsername
 
     # mongo user resources
     api.add_resource(UserResource, '/user')
@@ -125,6 +125,9 @@ def set_api():
     # mongo whoop resources
     api.add_resource(ShareWhoop, '/whoop/share')
     api.add_resource(Whoops, '/whoops/<string:user_id>')
+    api.add_resource(WhoopsByTitle, '/whoops/title/<string:title>')
+    api.add_resource(WhoopsByTag, '/whoops/tag/<string:tag>')
+    api.add_resource(WhoopsByUsername, '/whoops/username/<string:username>')
 
     # home page resources
     api.add_resource(HomePage, '/')

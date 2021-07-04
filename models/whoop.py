@@ -22,6 +22,7 @@ class Whoop(DynamicDocument):
 
     def to_json(self) -> dict:
         whoop_json = {
+            'id': str(self.pk),
             'title': self.title,
             'latitude': self.latitude,
             'longitude': self.longitude,

@@ -1,6 +1,10 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse 
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, get_jti, get_jwt
+
+from models.user import User
 from models.revoked_token import RevokedTokenModel
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, get_jwt, get_jti
+
+from mongoengine import DoesNotExist
 
 
 class TokenRefresh(Resource):
@@ -24,11 +28,9 @@ parser.add_argument("access_token", required=True,
 
 class TokenBlacklist(Resource):
     @classmethod
+    @jwt_required()
     def post(cls):
-        data = parser.parse_args()
-        jwt = data['access_token']
-
-        jti = get_jti(jwt)
+        jti = get_jwt()['jti']
 
         revoked_token = RevokedTokenModel(jti=jti)
         isTokenRevoked = revoked_token.is_jti_blacklisted(jti)
@@ -37,3 +39,25 @@ class TokenBlacklist(Resource):
             return {"message": "Token is in blacklist"}, 200
         else:
             return {"message": "Token does not exist in blacklist"}, 404
+
+
+# class TokenBlacklist(Resource):
+#     @classmethod
+#     @jwt_required()
+#     def post(cls):
+#         jti = get_jwt()['jti']
+
+#         revoked_token = RevokedTokenModel(jti=jti)
+#         isTokenRevoked = revoked_token.is_jti_blacklisted(jti)
+
+#         if isTokenRevoked:
+#             return {"message": "Token is in blacklist"}, 404
+#         else:
+#             user_jwt_id = get_jwt_identity()
+#             user = User.objects(pk=user_jwt_id).first()
+            
+#             return user.to_json(), 200
+            
+
+
+
