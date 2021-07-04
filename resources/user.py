@@ -20,6 +20,7 @@ class UserSignUp(Resource):
 
         user = User()
         user.email = user_json['email']
+        user.username = user_json['username']
         user.password = User.generate_hash(user_json['password'])
 
         user.save()
@@ -75,18 +76,8 @@ class UserResource(Resource):
         except DoesNotExist:
             return {'message': 'User not found!'}, 404
 
-        user_json = {
-            "id": str(user.pk),
-            "email": user.email,
-            "password": user.password
-        }
-
-        # It is better to use marshmallow here.
-        # user_json = user_schema.dump(user)
-        # user_json['whoops_count'] = len(user.whoops)
-
         # This function also has to return all the whoops belongs to the related user.
-        return user_json, 200
+        return user.to_json(), 200
 
     @classmethod
     @jwt_required()
@@ -102,6 +93,22 @@ class UserResource(Resource):
 
         return {'message': 'User deleted.'}, 200
 
+    @classmethod
+    @jwt_required()
+    def put(cls):
+        user_json = request.get_json()
+
+        user_jwt_id = get_jwt_identity()
+
+        try:
+            user = User.objects.get(pk=user_jwt_id)
+        except DoesNotExist:
+            return {'message': 'User not found!'}, 404
+
+        User.objects(pk=user_jwt_id).update(**user_json)
+
+        return {'message': 'User information updated successfully.'}, 200
+
 
 class AllUsers(Resource):
     @classmethod
@@ -112,9 +119,11 @@ class AllUsers(Resource):
 
         user_json = []
 
+        # Use  user.to_json and mapping to return all the user list instead.
         for user in User.objects:
             user_dict = {
                 'email': user.email,
+                'username': user.username,
                 'password': user.password
             }
 

@@ -39,7 +39,7 @@ class GoogleAuthorize(Resource):
         except DoesNotExist:
             user = User(email=gmail, password=None)
             user.save()
-            msg = 'User created successfully via Facebook OAuth.'
+            msg = 'User created successfully via Google OAuth.'
 
         access_token = create_access_token(
             identity=str(user.pk),
