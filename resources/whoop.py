@@ -22,14 +22,12 @@ class ShareWhoop(Resource):
     @jwt_required()
     def post(cls):
         whoop_json = request.get_json()
-        #whoop = whoop_schema.load(whoop_json)
+        print(whoop_json)
 
         add_second = whoop_json["time"]
         starting_time = datetime.now()
         # days, seconds, then other fields.
         ending_time = starting_time + timedelta(0, add_second)
-
-        print(whoop_json)
 
         user_jwt_id = get_jwt_identity()
 
@@ -41,19 +39,24 @@ class ShareWhoop(Resource):
 
         address = Address(**whoop_json['address'])
         whoop = Whoop(**whoop_json)
-        
+
+        whoop.is_active = True
         whoop.date_created = str(datetime.date(datetime.now()))
         whoop.starting_time = str(starting_time.strftime("%Y-%m-%d %H:%M:%S"))
         whoop.ending_time = str(ending_time.strftime("%Y-%m-%d %H:%M:%S"))
-        
+
         whoop.address = address
         whoop.user = loggedin_user
 
         whoop.save()
 
-        whoop_list.append(whoop.to_json())
+        # list of whoop models
+        whoop_list.append(whoop)
 
-        emitting_json = json.dumps({"whoops": whoop_list})
+        # list of whoop model jsons
+        whoop_json_list = [whoop.to_json() for whoop in whoop_list]
+
+        emitting_json = json.dumps({"whoops": whoop_json_list})
 
         print("----------------emitting json / resources.py----------------")
         print(emitting_json)
@@ -69,7 +72,6 @@ class Whoops(Resource):
     @classmethod
     @jwt_required()
     def get(cls, user_id: str):
-
         user = User()
         try:
             user = User.objects.get(pk=user_id)
@@ -77,9 +79,6 @@ class Whoops(Resource):
             return {'message': 'User {user_id} not found!'}, 404
 
         whoops = Whoop.objects(user=user).all()
-
-        whoops_json = []
-        for whoop in whoops:
-            whoops_json.append(whoop.to_json())
+        whoops_json = [whoop.to_json() for whoop in whoops]
 
         return whoops_json, 200
