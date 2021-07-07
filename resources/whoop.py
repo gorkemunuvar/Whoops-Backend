@@ -72,12 +72,7 @@ class Whoops(Resource):
     @classmethod
     @jwt_required()
     def get(cls, user_id: str):
-        user = User()
-
-        try:
-            user = User.objects.get(pk=user_id)
-        except DoesNotExist:
-            return {'message': 'User {user_id} not found!'}, 404
+        user = User(pk=user_id)
 
         whoops = Whoop.objects(user=user).all()
         whoops_json = [whoop.to_json() for whoop in whoops]

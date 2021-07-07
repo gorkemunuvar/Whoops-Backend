@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "93da83a21deeaa8cc39c73a889e26ec98c31ccaa4b959c07597548e2b4ac2757"
+            "sha256": "47e307ff11787faab1b2e1cc102f117eb15d23ca53155664ab68b0a0b0c0bf34"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -142,11 +142,19 @@
         },
         "flask-jwt-extended": {
             "hashes": [
-                "sha256:6a9d7a45d4c4b4c6277aee40f07cdf5fe307c29d404700a2ba8ebf520b30abee",
-                "sha256:76461f2dbdf502261c69ddecd858eaf4164fbcfbf05aa456f3927fc2ab0315de"
+                "sha256:22b8ffa7587d50aaf65f3009f1d55ef7287da8260eaf4655a5837e33479216c3",
+                "sha256:26969d931bd959dd6b82b2ac07733b499d52c8967229e70bf4ad5859de6cb3b2"
             ],
             "index": "pypi",
-            "version": "==4.2.1"
+            "version": "==4.2.3"
+        },
+        "flask-marshmallow": {
+            "hashes": [
+                "sha256:2adcd782b5a4a6c5ae3c96701f320d8ca6997995a52b2661093c56cc3ed24754",
+                "sha256:bd01a6372cbe50e36f205cfff0fc5dab0b7b662c4c8b2c4fc06a3151b2950950"
+            ],
+            "index": "pypi",
+            "version": "==0.14.0"
         },
         "flask-oauthlib": {
             "hashes": [
@@ -179,6 +187,13 @@
             ],
             "index": "pypi",
             "version": "==2.5.1"
+        },
+        "flask-uploads": {
+            "hashes": [
+                "sha256:53ecbd6033667d50ae02b63adebbaa33c7fc56c09e5293025810cf9d841ecb02"
+            ],
+            "index": "pypi",
+            "version": "==0.2.1"
         },
         "gevent": {
             "hashes": [
@@ -340,6 +355,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==2.0.1"
+        },
+        "marshmallow": {
+            "hashes": [
+                "sha256:77368dfedad93c3a041cbbdbce0b33fac1d8608c9e2e2288408a43ce3493d2ff",
+                "sha256:d4090ca9a36cd129126ad8b10c3982c47d4644a6e3ccb20534b512badce95f35"
+            ],
+            "index": "pypi",
+            "version": "==3.12.2"
         },
         "mongoengine": {
             "hashes": [
@@ -566,7 +589,7 @@
                 "sha256:1de1db30d010ff1af14a009224ec49ab2329ad2cde454c8a708130642d579c42",
                 "sha256:6c1ec500dcdba0baa27600f6a22f6333d8b662d22027ff9f6202e3367413caa8"
             ],
-            "markers": "python_version >= '3.6'",
+            "index": "pypi",
             "version": "==2.0.1"
         },
         "wheel": {

@@ -1,5 +1,6 @@
 #import eventlet
 
+import os
 import json
 from oa import oauth
 from datetime import datetime
@@ -7,37 +8,37 @@ from datetime import datetime
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_restful import Api
-from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager
-#from flask_uploads import patch_request_class, configure_uploads
+from flask_uploads import patch_request_class, configure_uploads
 
 from mongoengine import connect as handle_connection
 
 from dotenv import load_dotenv
 
 from helpers.task import scheduleTask
-#from helpers.image_helper import IMAGE_SET
+from helpers.image_helper import IMAGE_SET
 #from models.revoken_token import RevokedTokenModel
 from models.revoked_token import RevokedTokenModel
+from models.whoop import Whoop
 
 load_dotenv(".env", verbose=True)
 
-
 app = Flask(__name__)
+
 
 # load default configs from default_config.py
 app.config.from_object("default_config")
-
 app.config["MONGODB_DB"] = 'whoops-database'
 
 app.config.from_envvar(
     "APPLICATION_SETTINGS"
 )  # override with config.py (APPLICATION_SETTINGS points to config.py)
 
+
 # 10 MB max image size upload
-#patch_request_class(app, 10 * 1024 * 1024)
-#configure_uploads(app, IMAGE_SET)
+patch_request_class(app, 10 * 1024 * 1024)
+configure_uploads(app, IMAGE_SET)
 
 socketio = SocketIO(app, logger=True)
 jwt = JWTManager(app)
@@ -94,8 +95,11 @@ def connect():
     from g_variables import whoop_list
 
     print("A user connected.")
-    user_dict = {"whoops": whoop_list}
+
+    whoop_json_list = [whoop.to_json() for whoop in whoop_list]
+    user_dict = {"whoops": whoop_json_list}
     emitting_json = json.dumps(user_dict)
+
     socketio.emit("user_event", emitting_json)
 
 
@@ -104,7 +108,7 @@ def set_api():
     from resources.home import HomePage
     from resources.whoop import ShareWhoop
     from resources.token import TokenRefresh, TokenBlacklist
-    # from resources.image import ImageUpload, Image, AvatarUpload, Avatar
+    from resources.image import AvatarUpload, Avatar, AvatarUrl
     from resources.login_google import GoogleLogin, GoogleAuthorize
     from resources.login_facebook import FacebookLogin, FacebookAuthorize
 
@@ -140,10 +144,9 @@ def set_api():
     api.add_resource(TokenBlacklist, '/token/is_token_blacklisted')
 
     # image resources
-    #api.add_resource(ImageUpload, '/upload/image')
-    #api.add_resource(Image, '/image/<string:filename>')
-    #api.add_resource(AvatarUpload, '/upload/avatar')
-    #api.add_resource(Avatar, '/avatar/<int:user_id>')
+    api.add_resource(AvatarUpload, '/upload/avatar')
+    api.add_resource(Avatar, '/avatar/<string:user_id>')
+    api.add_resource(AvatarUrl, '/avatar_url/<string:user_id>')
 
     # google oauth resources
     api.add_resource(GoogleLogin, '/login/google')

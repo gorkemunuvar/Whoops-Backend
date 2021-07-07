@@ -17,6 +17,10 @@ wheel = "*"
 mongoengine = "*"
 gevent-websocket = "*"
 gevent = "*"
+flask-uploads = "*"
+marshmallow = "*"
+werkzeug = "*"
+flask-marshmallow = "*"
 
 [dev-packages]
 autopep8 = "*"
